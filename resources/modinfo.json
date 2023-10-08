@@ -1,0 +1,14 @@
+{
+    "type": "code",
+    "modid": "herbarium",
+    "name": "Herbarium",
+    "authors": [
+        "gabb", 
+        "CATASTEROID"
+    ],
+    "description": "a library of useful plant classes",
+    "version": "1.0.0",
+    "dependencies": {
+        "game": ""
+    }
+}
