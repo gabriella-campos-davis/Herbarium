@@ -53,11 +53,15 @@ namespace herbarium
             api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
             api.RegisterBlockEntityClass("BESeedling", typeof(BESeedling));
 
+            api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BEHerbariumSapling));
+
             api.RegisterBlockEntityClass("BEDuckWeedRoot", typeof(BEDuckWeedRoot));
 
             api.RegisterItemClass("ItemClipping", typeof(ItemClipping));
             api.RegisterItemClass("ItemBerrySeed", typeof(ItemBerrySeed));
             api.RegisterItemClass("HerbariumPoultice", typeof(HerbariumPoultice));
+
+            api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));
 
 
             try

@@ -1,0 +1,4 @@
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\modinfo.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\Herbarium.dll
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\Herbarium.deps.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\Herbarium.pdb

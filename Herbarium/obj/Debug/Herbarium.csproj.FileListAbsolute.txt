@@ -1,0 +1,13 @@
+D:\VSMods\Herbarium\Herbarium\obj\Debug\Herbarium.csproj.AssemblyReference.cache
+D:\VSMods\Herbarium\Herbarium\obj\Debug\Herbarium.GeneratedMSBuildEditorConfig.editorconfig
+D:\VSMods\Herbarium\Herbarium\obj\Debug\Herbarium.AssemblyInfoInputs.cache
+D:\VSMods\Herbarium\Herbarium\obj\Debug\Herbarium.AssemblyInfo.cs
+D:\VSMods\Herbarium\Herbarium\obj\Debug\Herbarium.csproj.CoreCompileInputs.cache
+D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\modinfo.json
+D:\VSMods\Herbarium\Herbarium\obj\Debug\Herbarium.dll
+D:\VSMods\Herbarium\Herbarium\obj\Debug\refint\Herbarium.dll
+D:\VSMods\Herbarium\Herbarium\obj\Debug\Herbarium.pdb
+D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\Herbarium.deps.json
+D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\Herbarium.dll
+D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\Herbarium.pdb
+D:\VSMods\Herbarium\Herbarium\obj\Debug\ref\Herbarium.dll
