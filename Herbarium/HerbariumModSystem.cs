@@ -62,6 +62,7 @@ namespace herbarium
             api.RegisterItemClass("HerbariumPoultice", typeof(HerbariumPoultice));
 
             api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));
+            api.RegisterItemClass("ItemWildShield", typeof(ItemWildShield));
 
 
             try

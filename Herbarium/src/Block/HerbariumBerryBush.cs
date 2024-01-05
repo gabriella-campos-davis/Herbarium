@@ -97,30 +97,23 @@ namespace herbarium
 
         public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
         {
-            if (this.Variant["state"] == "ripe")
+            var drops = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
+
+            foreach (var drop in drops)
             {
-                var drops = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
+                if (drop.Collectible is HerbariumBerryBush || drop.Collectible is PricklyBerryBush) continue;
 
-                foreach (var drop in drops)
+                float dropRate = 1;
+
+                if (Attributes?.IsTrue("forageStatAffected") == true)
                 {
-                    if (drop.Collectible is HerbariumBerryBush || drop.Collectible is PricklyBerryBush) continue;
-
-                    float dropRate = 1;
-
-                    if (Attributes?.IsTrue("forageStatAffected") == true)
-                    {
-                        dropRate *= byPlayer?.Entity.Stats.GetBlended("forageDropRate") ?? 1;
-                    }
-
-                    drop.StackSize = GameMath.RoundRandom(api.World.Rand, drop.StackSize * dropRate);
+                    dropRate *= byPlayer?.Entity.Stats.GetBlended("forageDropRate") ?? 1;
                 }
 
-                return drops;
+                drop.StackSize = GameMath.RoundRandom(api.World.Rand, drop.StackSize * dropRate);
             }
-            else
-            {
-                return null;
-            }
+
+            return drops;
         }
     }
 }

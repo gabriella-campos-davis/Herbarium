@@ -8,12 +8,14 @@ using Vintagestory.GameContent;
 
 namespace herbarium
 {
-    public class ItemWildTreeSeed : Item
+    //a class only used to get tree seeds to spin, because i couldn't figure out how to get them to spin without doing this
+    public class ItemWildTreeSeed : ItemTreeSeed 
     {
         WorldInteraction[] interactions;
-        
+
         public override void OnLoaded(ICoreAPI api)
         {
+
             if (api.Side != EnumAppSide.Client) return;
             ICoreClientAPI capi = api as ICoreClientAPI;
 
@@ -58,56 +60,6 @@ namespace herbarium
                     renderinfo.Transform.Rotation.Z = 0;
                 }
             }
-        }
-
-        public override void OnHeldInteractStart(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling)
-        {
-            if (blockSel == null || !byEntity.Controls.ShiftKey)
-            {
-                base.OnHeldInteractStart(itemslot, byEntity, blockSel, entitySel, firstEvent, ref handHandling);
-                return;
-            }
-
-            string treetype = Variant["type"];
-
-            Block saplBlock = byEntity.World.GetBlock(AssetLocation.Create("sapling-" + treetype + "-free", Code.Domain));
-
-            if (saplBlock != null)
-            {
-                IPlayer byPlayer = null;
-                if (byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-
-                blockSel = blockSel.Clone();
-                blockSel.Position.Up();
-
-                string failureCode = "";
-                if (!saplBlock.TryPlaceBlock(api.World, byPlayer, itemslot.Itemstack, blockSel, ref failureCode))
-                {
-                    if (api is ICoreClientAPI capi && failureCode != null && failureCode != "__ignore__")
-                    {
-                        capi.TriggerIngameError(this, failureCode, Lang.Get("placefailure-" + failureCode));
-                    }
-                } else
-                {
-                    byEntity.World.PlaySoundAt(new AssetLocation("sounds/block/dirt1"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
-
-                    ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
-
-                    if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
-                    {
-                        itemslot.TakeOut(1);
-                        itemslot.MarkDirty();
-                    }
-                }
-
-                handHandling = EnumHandHandling.PreventDefault;
-            }
-        }
-
-
-        public override WorldInteraction[] GetHeldInteractionHelp(ItemSlot inSlot)
-        {
-            return interactions.Append(base.GetHeldInteractionHelp(inSlot));
         }
     }
 }
