@@ -22,6 +22,7 @@ namespace herbarium
 
         RoomRegistry roomreg;
         public int roomness;
+        public string[] creatureDietFoodTags;
 
         float resetBelowTemperature = 0;
         float resetAboveTemperature = 0;
@@ -45,6 +46,7 @@ namespace herbarium
 
             if (api is ICoreServerAPI)
             {
+                creatureDietFoodTags = base.Block.Attributes["foodTags"].AsArray<string>();
                 if (transitionHoursLeft <= 0)
                 {
                     transitionHoursLeft = GetHoursForNextStage();
@@ -295,18 +297,16 @@ namespace herbarium
 
 
         #region IAnimalFoodSource impl
-        public bool IsSuitableFor(Entity entity, string[] diet)
+        public bool IsSuitableFor(Entity entity, CreatureDiet diet)
         {
             if (diet == null) return false;
 
-            if (!diet.Contains("Berry")) return false;
-
             if (!IsRipe()) return false;
 
-            return true;
+            return diet.Matches(EnumFoodCategory.NoNutrition, creatureDietFoodTags);
         }
 
-        public float ConsumeOnePortion()
+        public float ConsumeOnePortion(Entity entity)
         {
             AssetLocation loc = Block.CodeWithParts("empty");
             if (!loc.Valid)
