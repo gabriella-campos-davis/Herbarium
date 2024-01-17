@@ -57,9 +57,37 @@ namespace herbarium
                 return;
             }
 
+            if(api.World.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush)
+            {
+                return;
+            }
+
+
             string clippingtype = Variant["type"];
 
             Block clipBlock = byEntity.World.GetBlock(AssetLocation.Create("clipping-" + clippingtype + "-alive", Code.Domain));
+            
+            if(api.World.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush)
+            {
+                clipBlock = byEntity.World.GetBlock(AssetLocation.Create("scion-" + clippingtype + "-alive", Code.Domain));
+                if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial == EnumBlockMaterial.Air && clipBlock is not null)
+                {
+                    IPlayer byPlayer = null;
+                    if (byEntity is EntityPlayer)
+                        byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+
+                    api.World.BlockAccessor.SetBlock(clipBlock.Id, blockSel.Position.UpCopy());
+
+                    byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
+
+                    itemslot.TakeOut(1);
+                    itemslot.MarkDirty();
+                }
+                handHandling = EnumHandHandling.PreventDefault;
+
+                return;
+            }
+
 
             if (clipBlock != null)
             {
@@ -80,7 +108,7 @@ namespace herbarium
                 }
                 else
                 {
-                    byEntity.World.PlaySoundAt(new AssetLocation("sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
+                    byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
 
                     ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 

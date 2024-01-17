@@ -51,5 +51,17 @@ namespace herbarium
                 capi.Tesselator.TesselateShape(this, shape, out prunedmeshes[i], this.Shape.RotateXYZCopy, null, selems);
             }
         }
+        public override bool CanPlantStay(IBlockAccessor blockAccessor, BlockPos pos)
+        {
+            Block block = blockAccessor.GetBlock(pos.DownCopy());
+            BlockEntity blockEntity = blockAccessor.GetBlockEntity(pos.DownCopy());
+
+            Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
+            BlockEntity belowBlockEntity = blockAccessor.GetBlockEntity(pos.DownCopy());
+
+            Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
+            if (belowBlock.Fertility > 0) return true;
+            else return false;
+        }
     }
 }

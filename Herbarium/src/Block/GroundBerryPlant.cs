@@ -18,15 +18,8 @@ namespace herbarium
 
         public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
         {
-            if (this.Variant["state"] == "ripe")
-            {
-                ItemStack[] drops = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
-                return drops;
-            }
-            else
-            {
-                return null;
-            }
+            ItemStack[] drops = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
+            return drops;
         }
     }
 }

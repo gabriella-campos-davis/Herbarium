@@ -242,11 +242,11 @@ namespace herbarium
             Block nextBlock = Api.World.GetBlock(loc);
             if (nextBlock?.Code == null) return false;
 
-            if (nextCodePart == "ripe" && (Api.World.BlockAccessor.GetBlock(Pos.X, Pos.Y - 1, Pos.Z) is not HerbariumBerryBush) && 
-                Api.World.BlockAccessor.GetBlock(Pos.X, Pos.Y + 1, Pos.Z).BlockMaterial == 0) 
+            if (nextCodePart == "ripe" && (Api.World.BlockAccessor.GetBlock(Pos.X, Pos.DownCopy().Y, Pos.Z) is not HerbariumBerryBush) && 
+                Api.World.BlockAccessor.GetBlock(Pos.X, Pos.UpCopy().Y, Pos.Z).BlockMaterial == EnumBlockMaterial.Air) 
             {
                 Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
-                if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.AddCopy(0, 1, 0));
+                if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());
             }
 
             Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);

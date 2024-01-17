@@ -31,16 +31,15 @@ namespace herbarium
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
 
-            clipping = new ItemStack(api.World.GetItem(AssetLocation.Create(this.Attributes["pruneItem"].ToString())), 1);
-
             if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping) ||
                 (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping))
             {
 
-                //clipping = new ItemStack(api.World.GetItem(AssetLocation.Create("clipping-" + this.Variant["type"] + "-green", this.Code.Domain)), 1);
+                clipping = new ItemStack(api.World.GetItem(AssetLocation.Create(this.Attributes["pruneItem"].ToString())), 1);
 
                 if (clipping is null){
-                    throw new ArgumentNullException(nameof(clipping), "UndergrowthBerryBush clipping is Null. Exiting.");  
+                    api.Logger.Error("Attempted to create clipping for " + this.Variant["type"] + ", came back null.");
+                    return false;
                 }
 
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
@@ -87,11 +86,21 @@ namespace herbarium
         public override bool CanPlantStay(IBlockAccessor blockAccessor, BlockPos pos)
         {
             Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
-            if (belowBlock.Fertility > 0) return true;
-            if (!(belowBlock is HerbariumBerryBush || belowBlock is PricklyBerryBush)) return false;
 
-            Block belowbelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
-            return belowbelowBlock.Fertility > 0 && this.Attributes?.IsTrue("stackable") == true && belowBlock.Attributes?.IsTrue("stackable") == true;
+            if(belowBlock.Fertility > 0) return true; //we are on ground, everyone can be here
+            if(belowBlock.BlockMaterial == EnumBlockMaterial.Air) return false;
+            if(Attributes["stackable"].AsBool() is false) return false; //if we can't stack and aren't on ground, gtfo
+
+            if(Attributes["stackable"].AsBool() is true)
+            {
+                Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
+                if(belowBlock.BlockMaterial == EnumBlockMaterial.Air) return false;
+                if(belowBlock.Attributes["stackable"].AsBool() is true && belowBelowBlock.Fertility > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
 

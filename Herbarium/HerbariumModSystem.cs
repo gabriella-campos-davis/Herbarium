@@ -33,6 +33,7 @@ namespace herbarium
             api.RegisterBlockClass("PricklyBerryBush", typeof(PricklyBerryBush));
             api.RegisterBlockClass("ShrubBerryBush", typeof(ShrubBerryBush));
             api.RegisterBlockClass("GroundBerryPlant", typeof(GroundBerryPlant));
+            api.RegisterBlockClass("BlockClipping", typeof(BlockClipping));
 
             api.RegisterBlockClass("StoneBerryPlant", typeof(StoneBerryPlant));
             api.RegisterBlockClass("StonePlant", typeof(StonePlant));
@@ -59,6 +60,7 @@ namespace herbarium
 
             api.RegisterItemClass("ItemClipping", typeof(ItemClipping));
             api.RegisterItemClass("ItemBerrySeed", typeof(ItemBerrySeed));
+            api.RegisterItemClass("ItemHerbSeed", typeof(ItemHerbSeed));
             api.RegisterItemClass("HerbariumPoultice", typeof(HerbariumPoultice));
 
             api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));

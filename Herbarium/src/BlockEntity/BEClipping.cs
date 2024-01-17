@@ -112,15 +112,10 @@ namespace herbarium
             if(state == "dead")
             {
                 Block deadClippingBlock;
-                string growthOrClipping = "clipping";
 
                 bushType = this.Block.Variant["type"].ToString();
 
-                if(this.Block.Code.FirstCodePart() == "growth") {
-                    growthOrClipping = "growth";
-                }
-
-                deadClippingBlock = Api.World.GetBlock(AssetLocation.Create(growthOrClipping + bushType + "-dead", block.Code.Domain));
+                deadClippingBlock = Api.World.GetBlock(AssetLocation.Create(this.Block.Code.FirstCodePart() + bushType + "-dead", block.Code.Domain));
                 if (deadClippingBlock is null) return;
 
                 Api.World.BlockAccessor.SetBlock(deadClippingBlock.BlockId, Pos);
