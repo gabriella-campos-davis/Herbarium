@@ -12,9 +12,8 @@ using Vintagestory.GameContent;
 namespace herbarium
 {
     public class ItemHerbSeed : Item
-    {
-        Block herbBlock;
-        
+    {        
+        bool waterPlant = false;
         WorldInteraction[] interactions;
         public override void OnLoaded(ICoreAPI api)
         {
@@ -48,26 +47,76 @@ namespace herbarium
                 };
             });
         }
+        private void placeHerb(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling){
+            api.Logger.Error("herb block start");
+            if (!byEntity.Controls.Sneak)
+            {
+                //base.OnHeldInteractStart(itemslot, byEntity, blockSel, entitySel, firstEvent, ref handHandling);
+                return;
+            }
+
+            string herbtype = this.Variant["herbseedlings"];
+            Block herbBlock = api.World.GetBlock(AssetLocation.Create("seedling-" + herbtype + "-planted", this.Code.Domain)); 
+
+            api.Logger.Error("herb block made");
+
+            if (herbBlock is not null)
+            {
+                api.Logger.Error("herb block not null");
+                if(Attributes["waterplant"].AsBool())
+                {
+                    waterPlant = true;
+                }
+
+                api.Logger.Error("herb block not in water");
+                if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial != EnumBlockMaterial.Air)
+                {
+                    if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial == EnumBlockMaterial.Liquid && waterPlant)
+                    {
+                        goto plantHerb;
+                    }
+                    return;
+                }
+                plantHerb:
+                if(herbBlock is not null)
+                {
+                    IPlayer byPlayer = null;
+                    if (byEntity is EntityPlayer)
+                        byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
+
+                    api.World.BlockAccessor.SetBlock(herbBlock.Id, blockSel.Position.UpCopy());
+
+                    byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
+
+                    itemslot.TakeOut(1);
+                    itemslot.MarkDirty();
+
+                }
+            }
+            handHandling = EnumHandHandling.PreventDefault;
+            return;
+        }
         public override void OnHeldInteractStart(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling)
         {
             if(blockSel is null) return;
-            BlockPos pos = blockSel.Position;
+            BlockPos pos = blockSel.Position.Copy();
             string lastCodePart = itemslot.Itemstack.Collectible.LastCodePart();
-            BlockEntity be = byEntity.World.BlockAccessor.GetBlockEntity(pos);
+            Block belowBlock = api.World.BlockAccessor.GetBlock(pos);
+            BlockEntity be = api.World.BlockAccessor.GetBlockEntity(pos);
+            if(belowBlock.BlockMaterial != EnumBlockMaterial.Soil) return;
+            if (be is not BlockEntityFarmland) placeHerb(itemslot, byEntity, blockSel, entitySel, true, ref handHandling);
             if (be is BlockEntityFarmland && Attributes["isCrop"].AsBool())
             {
                placeCrop(itemslot, byEntity, blockSel, entitySel, true, ref handHandling);
             }
-            if(be is not BlockEntityFarmland)
-            {
-                placeHerb(itemslot, byEntity, blockSel, entitySel, true, ref handHandling);
-            }
+            return;
         }
 
         private void placeCrop(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling){
+            api.Logger.Error("crop start");
             string lastCodePart = itemslot.Itemstack.Collectible.LastCodePart();
             BlockPos pos = blockSel.Position;
-            BlockEntity be = byEntity.World.BlockAccessor.GetBlockEntity(pos);
+            BlockEntity be = api.World.BlockAccessor.GetBlockEntity(pos);
 
             Block cropBlock = byEntity.World.GetBlock(CodeWithPath("crop-" + lastCodePart + "-1"));
             if (cropBlock == null) return;
@@ -78,7 +127,7 @@ namespace herbarium
             bool planted = ((BlockEntityFarmland)be).TryPlant(cropBlock);
             if (planted)
             {
-                byEntity.World.PlaySoundAt(new AssetLocation("sounds/block/plant"), pos.X, pos.Y, pos.Z, byPlayer);
+                byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), pos.X, pos.Y, pos.Z, byPlayer);
 
                 ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 
@@ -90,62 +139,10 @@ namespace herbarium
             }
 
             if (planted) handHandling = EnumHandHandling.PreventDefault;
+            return;
         }
 
-        private void placeHerb(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling){
-            if (blockSel == null || !byEntity.Controls.Sneak)
-            {
-                base.OnHeldInteractStart(itemslot, byEntity, blockSel, entitySel, firstEvent, ref handHandling);
-                return;
-            }
-
-            string herbtype = this.LastCodePart();
-            herbBlock = byEntity.Api.World.GetBlock(AssetLocation.Create("seedling-" + herbtype + "-planted", Code.Domain));
-
-            if (herbBlock != null)
-            {
-                IPlayer byPlayer = null;
-                if (byEntity is EntityPlayer)
-                    byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-
-                blockSel = blockSel.Clone();
-                blockSel.Position.Up();
-                if(byEntity.Api.World.GetBlockAccessor(true, false, true).GetBlock(blockSel.Position).IsLiquid() == true){
-                    if (Attributes["waterplant"].AsBool())
-                    {
-                        goto growPlant;
-                    }
-                    else 
-                    {
-                        return;
-                    }
-                }
-                growPlant:
-
-                string failureCode = "";
-                if (!herbBlock.TryPlaceBlock(api.World, byPlayer, itemslot.Itemstack, blockSel, ref failureCode))
-                {
-                    if (api is ICoreClientAPI capi && failureCode != null && failureCode != "__ignore__")
-                    {
-                        capi.TriggerIngameError(this, failureCode, Lang.Get("placefailure-" + failureCode));
-                    }
-                }
-                else
-                {
-                    byEntity.World.PlaySoundAt(new AssetLocation("sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
-
-                    ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
-
-                    if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
-                    {
-                        itemslot.TakeOut(1);
-                        itemslot.MarkDirty();
-                    }
-                }
-
-                handHandling = EnumHandHandling.PreventDefault;
-            }
-        }
+        
 
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {

@@ -87,6 +87,9 @@ namespace herbarium
         {
             Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
 
+            if(belowBlock is null) return false;
+            if(belowBlock.Attributes is null) return false;
+
             if(belowBlock.Fertility > 0) return true; //we are on ground, everyone can be here
             if(belowBlock.BlockMaterial == EnumBlockMaterial.Air) return false;
             if(Attributes["stackable"].AsBool() is false) return false; //if we can't stack and aren't on ground, gtfo
@@ -94,6 +97,8 @@ namespace herbarium
             if(Attributes["stackable"].AsBool() is true)
             {
                 Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
+                if(belowBelowBlock is null) return false;
+                if(belowBelowBlock.Attributes is null) return false;
                 if(belowBlock.BlockMaterial == EnumBlockMaterial.Air) return false;
                 if(belowBlock.Attributes["stackable"].AsBool() is true && belowBelowBlock.Fertility > 0)
                 {

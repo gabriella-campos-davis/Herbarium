@@ -62,6 +62,21 @@ namespace herbarium
 
                 Block aboveBlock;
 
+                BlockPos topBlockPos = new BlockPos(Pos.X, Api.World.BlockAccessor.GetRainMapHeightAt(Pos.Copy()), Pos.Z, 0);
+                Block topBlock = Api.World.BlockAccessor.GetBlock(topBlockPos);
+                /*
+                if(!topBlock.IsLiquid()) 
+                {
+                    if(topBlock.BlockMaterial == EnumBlockMaterial.Plant) Api.World.BlockAccessor.SetBlock(0, Pos);
+                    return;
+                }
+   
+
+                Block placingBlock = this.Api.World.BlockAccessor.GetBlock(new AssetLocation(Block.Attributes["duckweedBlock"].ToString()));
+                Api.World.BlockAccessor.SetBlock(placingBlock.BlockId, topBlockPos.UpCopy());
+
+                Api.World.BlockAccessor.SetBlock(0, Pos);
+                */
                 while(lakeTop == false)
                 {
                     aboveBlock = this.Api.World.BlockAccessor.GetBlock(Pos.UpCopy(currentDepth));
@@ -85,8 +100,8 @@ namespace herbarium
                     currentDepth += 1;
                 }
                 this.Api.World.BlockAccessor.SetBlock(0, Pos);
+                
             }
-            
         }
     }
 }

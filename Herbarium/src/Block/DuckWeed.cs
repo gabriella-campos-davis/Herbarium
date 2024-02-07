@@ -98,7 +98,7 @@ namespace herbarium
                     belowBlock = world.BlockAccessor.GetBlock(pos.X, pos.DownCopy(currentDepth).Y, pos.Z);
                     if (belowBlock.LiquidCode != "water" && belowBlock.BlockMaterial != EnumBlockMaterial.Plant)
                     {
-                        Block placingBlock = world.BlockAccessor.GetBlock(new AssetLocation(Attributes["duckweedBlock"].ToString()));
+                        Block placingBlock = world.BlockAccessor.GetBlock(new AssetLocation(Attributes["rootBlock"].ToString()));
                         if (placingBlock == null) return;
 
                         if(world.BlockAccessor.GetBlock(pos.X, pos.DownCopy(currentDepth-1).Y, pos.Z).BlockMaterial ==  EnumBlockMaterial.Plant) return;
