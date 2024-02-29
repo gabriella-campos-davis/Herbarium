@@ -60,7 +60,6 @@ namespace herbarium
             bushType = this.Block.Variant["type"].ToString();
         }
 
-
         private void CheckGrow(float dt)
         {
             if (Api.World.Calendar.TotalHours < totalHoursTillGrowth)
@@ -88,6 +87,7 @@ namespace herbarium
             {
                 return;
             }
+            if (bushCode is null) return;
 
             DoGrow("alive");
             
