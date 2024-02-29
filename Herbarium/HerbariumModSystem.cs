@@ -45,6 +45,8 @@ namespace herbarium
             api.RegisterBlockClass("DuckWeed", typeof(DuckWeed));
             api.RegisterBlockClass("DuckWeedRoot", typeof(DuckWeedRoot));
 
+            api.RegisterBlockClass("BlockRequiresGravelOrSand", typeof(BlockRequiresGravelOrSand));
+
             api.RegisterBlockClass("GiantKelp", typeof(GiantKelp));
            
             api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
