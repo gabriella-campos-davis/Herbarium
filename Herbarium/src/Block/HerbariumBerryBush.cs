@@ -41,12 +41,12 @@ namespace herbarium
                     {
                         toolStacklist.Add(new ItemStack(item));
                     }
-                    if(!HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping && item.Tool == EnumTool.Shears)
+                    else if(!HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping && item.Tool == EnumTool.Shears)
                     {
                         toolStacklist.Add(new ItemStack(item));
                     }
 
-                    if(HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping)
+                    else if(HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping)
                     {
                         if (item.Tool == EnumTool.Knife || item.Tool == EnumTool.Shears)
                         {
@@ -83,20 +83,20 @@ namespace herbarium
                     GiveClipping(world, byPlayer, blockSel);
                     return true;
                 }
-                if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && !beugtbush.Pruned )
+                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && !beugtbush.Pruned )
                 {
                     beugtbush.Prune();
                     GiveClipping(world, byPlayer, blockSel);
                     return true;
                 }
-                if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && !beugsbush.Pruned )
+                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && !beugsbush.Pruned )
                 {
                     beugsbush.Prune();
                     GiveClipping(world, byPlayer, blockSel);
                     return true;
                 } 
             }
-            return base.OnBlockInteractStart(world, byPlayer, blockSel); 
+            return false; 
         }
 
         void GiveClipping(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)

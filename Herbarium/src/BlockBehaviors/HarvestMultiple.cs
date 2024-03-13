@@ -122,7 +122,7 @@ namespace herbarium
                 for(int i = 0; i < harvestedStacks.Length; i++)
                 {
                     ItemStack stack = harvestedStacks[i].GetNextItemStack(dropRate);
-                    if (stack == null) return;
+                    if (stack == null) continue;
                     var origStack = stack.Clone();
 
                     if (byPlayer?.InventoryManager.TryGiveItemstack(stack) == false)
