@@ -4,6 +4,7 @@ using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 using Vintagestory.GameContent;
+using Vintagestory.API.Datastructures;
 using System.Linq;
 using System;
 using Vintagestory.API.Common.Entities;
@@ -14,27 +15,61 @@ namespace herbarium
 {
     public class HerbariumBerryBush : BlockBerryBush
     {
-        ItemStack clipping = new();
+        WorldInteraction[] interactions;
+        ItemStack clipping = new();        
+        public AssetLocation harvestedSound = AssetLocation.Create("herbarium:sounds/branch_trim_new");
+        public AssetLocation harvestingSound = AssetLocation.Create("game:sounds/block/leafy_picking");
+
         
-        public AssetLocation harvestingSound;
 
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
-            
-            string code = "game:sounds/block/leafy-picking";
-            if (code != null) {
-                harvestingSound = AssetLocation.Create(code, this.Code.Domain);
-            }
-        }
 
+            if (api.Side != EnumAppSide.Client) return;
+            ICoreClientAPI capi = api as ICoreClientAPI;
+
+            interactions = ObjectCacheUtil.GetOrCreate(api, "berrybushclippingInteractions", () =>
+            {
+                List<ItemStack> toolStacklist = new List<ItemStack>();
+                foreach (Item item in api.World.Items)
+                {
+                    if (item.Code == null)
+                        continue;
+
+                    if(HerbariumConfig.Current.useKnifeForClipping && !HerbariumConfig.Current.useShearsForClipping && item.Tool == EnumTool.Knife)
+                    {
+                        toolStacklist.Add(new ItemStack(item));
+                    }
+                    if(!HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping && item.Tool == EnumTool.Shears)
+                    {
+                        toolStacklist.Add(new ItemStack(item));
+                    }
+
+                    if(HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping)
+                    {
+                        if (item.Tool == EnumTool.Knife || item.Tool == EnumTool.Shears)
+                        {
+                            toolStacklist.Add(new ItemStack(item));
+                        } 
+                    }
+                }
+
+                return new WorldInteraction[] {
+                    new WorldInteraction()
+                    {
+                        Itemstacks = toolStacklist.ToArray(),
+                        MouseButton = EnumMouseButton.Right,
+                        ActionLangCode = "herbarium:blockhelp-berrybush-clip",
+                    }
+                };
+            });
+        }
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
-
             if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping) ||
                 (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping))
-            {
-
+                {
                 clipping = new ItemStack(api.World.GetItem(AssetLocation.Create(this.Attributes["pruneItem"].ToString())), 1);
 
                 if (clipping is null){
@@ -45,43 +80,36 @@ namespace herbarium
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
                 {
                     beugbush.Prune();
-                    if (byPlayer?.InventoryManager.TryGiveItemstack(clipping) == false)
-                    {
-                        world.SpawnItemEntity(clipping, byPlayer.Entity.SidedPos.XYZ);
-                    }
-
-                    world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-
+                    GiveClipping(world, byPlayer, blockSel);
                     return true;
                 }
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && !beugtbush.Pruned )
                 {
                     beugtbush.Prune();
-                    if (byPlayer?.InventoryManager.TryGiveItemstack(clipping) == false)
-                    {
-                        world.SpawnItemEntity(clipping, byPlayer.Entity.SidedPos.XYZ);
-                    }
-
-                    world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-
+                    GiveClipping(world, byPlayer, blockSel);
                     return true;
                 }
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && !beugsbush.Pruned )
                 {
                     beugsbush.Prune();
-                    if (byPlayer?.InventoryManager.TryGiveItemstack(clipping) == false)
-                    {
-                        world.SpawnItemEntity(clipping, byPlayer.Entity.SidedPos.XYZ);
-                    }
-
-                    world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-
+                    GiveClipping(world, byPlayer, blockSel);
                     return true;
                 } 
             }
-
             return base.OnBlockInteractStart(world, byPlayer, blockSel); 
         }
+
+        void GiveClipping(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
+        {
+            if (byPlayer?.InventoryManager.TryGiveItemstack(clipping) == false)
+            {
+                world.SpawnItemEntity(clipping, byPlayer.Entity.SidedPos.XYZ);
+            }
+                    
+            byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack.Collectible.DamageItem(world, byPlayer as Entity, byPlayer.InventoryManager.ActiveHotbarSlot, 1);
+            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);   
+        }
+
 
         public override bool CanPlantStay(IBlockAccessor blockAccessor, BlockPos pos)
         {
@@ -128,6 +156,10 @@ namespace herbarium
             }
 
             return drops;
+        }
+        public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
+        {
+            return base.GetPlacedBlockInteractionHelp(world, selection, forPlayer).Append(interactions);
         }
     }
 }

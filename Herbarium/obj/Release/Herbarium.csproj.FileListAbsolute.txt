@@ -1,3 +1,10 @@
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\assets\herbarium\lang\en.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\assets\herbarium\lang\es-419.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\assets\herbarium\lang\es-es.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\assets\herbarium\lang\fr.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\assets\herbarium\lang\ru.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\assets\herbarium\sounds\branch_trim_new.ogg
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\modicon.png
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\modinfo.json
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\Herbarium.deps.json
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\Herbarium.dll

@@ -225,6 +225,16 @@
             <param name="defaultValue"></param>
             <returns></returns>
         </member>
+        <member name="M:Vintagestory.API.Common.CmdArgs.TryParseIntFancy(System.String,System.Int32@)">
+            <summary>
+            Tries to parse a string to an integer, returns 0 if it fails
+            <br/>Enhancements over system int.TryParse():  (1) the thousands separator (comma) is ignored  (2) hex numbers are possible with 0x prefix  (3) uint values over int.MaxValue are possible (may convert to a negative int, but that can be converted back to the original uint), more generally any valid long value is permitted
+            <br/>All three enhancements are useful if we ever need, in a command, to set - for example - a color value (32 bits) from hex or unsigned decimal
+            </summary>
+            <param name="arg"></param>
+            <param name="val"></param>
+            <returns></returns>
+        </member>
         <member name="M:Vintagestory.API.Common.CmdArgs.PopLong(System.Nullable{System.Int64})">
             <summary>
             Tries to retrieve arg at given index as long, or null if not enough arguments or not a long
@@ -2197,6 +2207,17 @@
             <param name="initialDelayOffsetMs"></param>
             <returns>listenerId</returns>
         </member>
+        <member name="M:Vintagestory.API.Common.IEventAPI.RegisterGameTickListener(System.Action{System.Single},System.Action{System.Exception},System.Int32,System.Int32)">
+            <summary>
+            Calls given method after every given interval until unregistered. The engine may call your method slightly later since these event are handled only during fixed interval game ticks.
+            This overload includes an ErrorHandler callback, triggered if calling onGameTick throws an exception
+            </summary>
+            <param name="onGameTick"></param>
+            <param name="errorHandler"></param>
+            <param name="millisecondInterval"></param>
+            <param name="initialDelayOffsetMs"></param>
+            <returns>listenerId</returns>
+        </member>
         <member name="M:Vintagestory.API.Common.IEventAPI.RegisterGameTickListener(System.Action{Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.MathTools.BlockPos,System.Single},Vintagestory.API.MathTools.BlockPos,System.Int32,System.Int32)">
             <summary>
             Calls given method after every given interval until unregistered. The engine may call your method slightly later since these event are handled only during fixed interval game ticks.
@@ -2213,6 +2234,16 @@
             </summary>
             <param name="OnTimePassed"></param>
             <param name="millisecondDelay"></param>
+            <returns>listenerId</returns>
+        </member>
+        <member name="M:Vintagestory.API.Common.IEventAPI.RegisterCallback(System.Action{System.Single},System.Int32,System.Boolean)">
+            <summary>
+            Calls given method after supplied amount of milliseconds. The engine may call your method slightly later since these event are handled only during fixed interval game ticks.
+            This overload can be used to signify callbacks which do no harm if registered while the game is paused (otherwise, registering a callback while paused will produce an error in logs, or an intentional exception in Developer Mode)
+            </summary>
+            <param name="OnTimePassed"></param>
+            <param name="millisecondDelay"></param>
+            <param name="permittedWhilePaused"></param>
             <returns>listenerId</returns>
         </member>
         <member name="M:Vintagestory.API.Common.IEventAPI.RegisterCallback(System.Action{Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.MathTools.BlockPos,System.Single},Vintagestory.API.MathTools.BlockPos,System.Int32)">
@@ -3178,6 +3209,13 @@
             List of all loaded crafting recipes
             </summary>
         </member>
+        <member name="M:Vintagestory.API.Common.IWorldAccessor.GetRecipeRegistry(System.String)">
+            <summary>
+            Retrieve a previously registered recipe registry
+            </summary>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
         <member name="P:Vintagestory.API.Common.IWorldAccessor.DefaultEntityTrackingRange">
             <summary>
             The range in blocks within a client will receive regular updates for an entity
@@ -3900,13 +3938,14 @@
             <param name="side">If null, all the decor blocks on all sides are removed</param>
             <param name="decorIndex">If not null breaks only this part of the decor for give face. Requires side to be set.</param>
         </member>
-        <member name="M:Vintagestory.API.Common.IWorldChunk.BreakAllDecorFast(Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.MathTools.BlockPos,System.Int32)">
+        <member name="M:Vintagestory.API.Common.IWorldChunk.BreakAllDecorFast(Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.MathTools.BlockPos,System.Int32,System.Boolean)">
             <summary>
             Removes a decor block from given position, saves a few cpu cycles by not calculating index3d
             </summary>
             <param name="world"></param>
             <param name="pos"></param>
             <param name="index3d"></param>
+            <param name="callOnBrokenAsDecor">When set to true it will call block.OnBrokenAsDecor(...) which is used to drop the decors of that block</param>
         </member>
         <member name="M:Vintagestory.API.Common.IWorldChunk.GetDecors(Vintagestory.API.Common.IBlockAccessor,Vintagestory.API.MathTools.BlockPos)">
             <summary>
@@ -4089,6 +4128,9 @@
         <member name="P:Vintagestory.API.Common.ModInfo.Dependencies">
             <summary> List of mods (and versions) this mod depends on. </summary>
         </member>
+        <member name="F:Vintagestory.API.Common.ModInfo.CoreMod">
+            <summary> Not exposed as a JsonProperty, only coded mods can set this to true </summary>
+        </member>
         <member name="M:Vintagestory.API.Common.ModInfo.ToModID(System.String)">
             <summary>
             Attempts to convert the specified mod name to a mod ID, stripping any
@@ -4117,6 +4159,9 @@
         </member>
         <member name="P:Vintagestory.API.Common.ModInfoAttribute.Version">
             <summary> The version of this mod. For example "2.10.4". (optional) </summary>
+        </member>
+        <member name="P:Vintagestory.API.Common.ModInfoAttribute.CoreMod">
+            <summary> Is this mod part of the core game, i.e. vanilla Vintage Story?  (optional)  <br/>Only affects whether the player is given a warning when attempting to disable this mod.<br/>Mods other than VSSurvival, VSEssentials, VSCreative should not use this, obviously... </summary>
         </member>
         <member name="P:Vintagestory.API.Common.ModInfoAttribute.NetworkVersion">
             <summary>
@@ -4934,12 +4979,12 @@
         </member>
         <member name="F:Vintagestory.API.Common.Block.CropProps">
             <summary>
-            Information about the blocks as a crop 
+            Information about the blocks as a crop
             </summary>
         </member>
         <member name="F:Vintagestory.API.Common.Block.EntityClass">
             <summary>
-            If this block has a block entity attached to it, this will store it's code 
+            If this block has a block entity attached to it, this will store it's code
             </summary>
         </member>
         <member name="P:Vintagestory.API.Common.Block.PushVector">
@@ -4970,7 +5015,7 @@
         </member>
         <member name="P:Vintagestory.API.Common.Block.AllSidesOpaque">
             <summary>
-            Sets the whole SideOpaque array to true 
+            Sets the whole SideOpaque array to true
             </summary>
         </member>
         <member name="M:Vintagestory.API.Common.Block.DisplacesLiquids(Vintagestory.API.Common.IBlockAccessor,Vintagestory.API.MathTools.BlockPos)">
@@ -4984,6 +5029,12 @@
         <member name="M:Vintagestory.API.Common.Block.SideIsSolid(Vintagestory.API.MathTools.BlockPos,System.Int32)">
             <summary>
             Does the side APPEAR fully solid?  Called for example when deciding to render water edges at a position, or not
+            Note: Worldgen code uses the blockAccessor-aware overload of this method
+            </summary>
+        </member>
+        <member name="M:Vintagestory.API.Common.Block.SideIsSolid(Vintagestory.API.Common.IBlockAccessor,Vintagestory.API.MathTools.BlockPos,System.Int32)">
+            <summary>
+            Is the side solid or almost fully solid (in the case of chiselled blocks)?  Called for example when deciding to place loose stones or boulders above this during worldgen
             </summary>
         </member>
         <member name="M:Vintagestory.API.Common.Block.ShouldMergeFace(System.Int32,Vintagestory.API.Common.Block,System.Int32)">
@@ -5053,6 +5104,14 @@
             <param name="blockAccessor"></param>
             <param name="pos">May be null and therfore stack is non-null</param>
             <param name="stack"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Common.Block.GetAttributes(Vintagestory.API.Common.IBlockAccessor,Vintagestory.API.MathTools.BlockPos)">
+            <summary>
+            Position-aware version of Attributes, for example can be used by BlockMultiblock
+            </summary>
+            <param name="blockAccessor"></param>
+            <param name="pos"></param>
             <returns></returns>
         </member>
         <member name="M:Vintagestory.API.Common.Block.GetLiquidCode(Vintagestory.API.Common.IBlockAccessor,Vintagestory.API.MathTools.BlockPos)">
@@ -5126,7 +5185,7 @@
         </member>
         <member name="M:Vintagestory.API.Common.Block.DoPlaceBlock(Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.Common.IPlayer,Vintagestory.API.Common.BlockSelection,Vintagestory.API.Common.ItemStack)">
             <summary>
-            Called by TryPlaceBlock if placement is possible 
+            Called by TryPlaceBlock if placement is possible
             </summary>
             <param name="world"></param>
             <param name="byPlayer"></param>
@@ -5303,7 +5362,7 @@
             <summary>
             Everytime the player moves by 8 blocks (or rather leaves the current 8-grid), a scan of all blocks 32x32x32 blocks around the player is initiated<br/>
             and this method is called. If the method returns true, the block is registered to a client side game ticking for spawning particles and such.<br/>
-            This method will be called everytime the player left his current 8-grid area. 
+            This method will be called everytime the player left his current 8-grid area.
             </summary>
             <param name="world"></param>
             <param name="player"></param>
@@ -5334,7 +5393,7 @@
             is called on a separate server thread. This should be considered when deciding how to access blocks.
             If true is returned, the server will call OnServerGameTick on the main thread passing the BlockPos
             and the 'extra' object if specified. The 'extra' parameter is meant to prevent duplicating lookups
-            and other calculations when OnServerGameTick is called. 
+            and other calculations when OnServerGameTick is called.
             </summary>
             <param name="world"></param>
             <param name="pos">The position of this block</param>
@@ -5352,7 +5411,7 @@
         </member>
         <member name="M:Vintagestory.API.Common.Block.OnJsonTesselation(Vintagestory.API.Client.MeshData@,System.Int32[]@,Vintagestory.API.MathTools.BlockPos,Vintagestory.API.Common.Block[],System.Int32)">
             <summary>
-            If this block uses drawtype json, this method will be called everytime a chunk containing this block is tesselated. 
+            If this block uses drawtype json, this method will be called everytime a chunk containing this block is tesselated.
             </summary>
             <param name="sourceMesh"></param>
             <param name="lightRgbsByCorner">Emitted light from this block</param>
@@ -5491,12 +5550,12 @@
             <returns></returns>
         </member>
         <member name="M:Vintagestory.API.Common.Block.GetSelectionColor(Vintagestory.API.Client.ICoreClientAPI,Vintagestory.API.MathTools.BlockPos)">
-            <summary>
+             <summary>
             
-            </summary>
-            <param name="capi"></param>
-            <param name="pos"></param>
-            <returns></returns>
+             </summary>
+             <param name="capi"></param>
+             <param name="pos"></param>
+             <returns></returns>
         </member>
         <member name="M:Vintagestory.API.Common.Block.OnCollectTextures(Vintagestory.API.Common.ICoreAPI,Vintagestory.API.Common.ITextureLocationDictionary)">
             <summary>
@@ -6171,6 +6230,7 @@
         <member name="P:Vintagestory.API.Common.BlockSchematic.BlockRemaps">
             <summary>
             Set by the RemapperAssistant in OnFinalizeAssets
+            <br/>Heads up!:  This is unordered, it will iterate through the different game versions' remaps not necessarily in the order they originally appear in remaps.json config.  If any block remaps over the years have duplicate original block names, behavior for those ones may be unpredictable
             </summary>
         </member>
         <member name="P:Vintagestory.API.Common.BlockSchematic.ItemRemaps">
@@ -6816,7 +6876,7 @@
         </member>
         <member name="P:Vintagestory.API.Common.CollectibleObject.IsMissing">
             <summary>
-            This value is set the the BlockId or ItemId-Remapper if it encounters a block/item in the savegame, 
+            This value is set the the BlockId or ItemId-Remapper if it encounters a block/item in the savegame,
             but no longer exists as a loaded block/item
             </summary>
         </member>
@@ -6996,14 +7056,14 @@
             </summary>
         </member>
         <member name="F:Vintagestory.API.Common.CollectibleObject.HeldLeftReadyAnimation">
-            <summary>
+             <summary>
             
-            </summary>
+             </summary>
         </member>
         <member name="F:Vintagestory.API.Common.CollectibleObject.HeldRightReadyAnimation">
-            <summary>
+             <summary>
             
-            </summary>
+             </summary>
         </member>
         <member name="F:Vintagestory.API.Common.CollectibleObject.HeldTpUseAnimation">
             <summary>
@@ -7039,7 +7099,7 @@
         </member>
         <member name="M:Vintagestory.API.Common.CollectibleObject.GetLightHsv(Vintagestory.API.Common.IBlockAccessor,Vintagestory.API.MathTools.BlockPos,Vintagestory.API.Common.ItemStack)">
             <summary>
-            Should return the light HSV values. 
+            Should return the light HSV values.
             Warning: This method is likely to get called in a background thread. Please make sure your code in here is thread safe.
             </summary>
             <param name="blockAccessor"></param>
@@ -7098,7 +7158,7 @@
         <member name="M:Vintagestory.API.Common.CollectibleObject.OnBeforeRender(Vintagestory.API.Client.ICoreClientAPI,Vintagestory.API.Common.ItemStack,Vintagestory.API.Client.EnumItemRenderTarget,Vintagestory.API.Client.ItemRenderInfo@)">
             <summary>
             This method is called before rendering the item stack into GUI, first person hand, third person hand and/or on the ground
-            The renderinfo object is pre-filled with default values. 
+            The renderinfo object is pre-filled with default values.
             </summary>
             <param name="capi"></param>
             <param name="itemstack"></param>
@@ -7140,7 +7200,7 @@
         </member>
         <member name="M:Vintagestory.API.Common.CollectibleObject.OnModifiedInInventorySlot(Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.Common.ItemSlot,Vintagestory.API.Common.ItemStack)">
             <summary>
-            Whenever the collectible was modified while inside a slot, usually when it was moved, split or merged.  
+            Whenever the collectible was modified while inside a slot, usually when it was moved, split or merged.
             </summary>
             <param name="world"></param>
             <param name="slot">The slot the item is or was in</param>
@@ -7785,6 +7845,13 @@
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Common.CollectibleObject.OnSmeltAttempt(Vintagestory.API.Common.InventoryBase)">
+            <summary>
+            Called immediately prior to a firepit or similar testing whether this Collectible can be smelted
+            <br/>Returns true if the caller should be marked dirty
+            </summary>
+            <param name="inventorySmelting"></param>
         </member>
         <member name="F:Vintagestory.API.Common.CollectibleBehavior.collObj">
             <summary>
@@ -8876,6 +8943,11 @@
             Snow/ice melting
             </summary>
         </member>
+        <member name="F:Vintagestory.API.Common.EnumTransitionType.Harden">
+            <summary>
+            Glue hardening
+            </summary>
+        </member>
         <member name="F:Vintagestory.API.Common.TransitionableProperties.Type">
             <summary>
             What kind of transition can it make?
@@ -9454,6 +9526,13 @@
         <member name="F:Vintagestory.API.Common.Entities.Entity.Api">
             <summary>
             The api, if you need it. Available on the game client and server.
+            </summary>
+        </member>
+        <member name="P:Vintagestory.API.Common.Entities.Entity.IsCreature">
+            <summary>
+            Used by AItasks for perfomance. When searching for nearby entities we distinguish between (A) Creatures and (B) Inanimate entitie. Inanimate entities are items on the ground, projectiles, armor stands, rafts, falling blocks etc
+            <br/>Note 1: Dead creatures / corpses count as a Creature. EntityPlayer is a Creature of course.
+            <br/>Note 2: Straw Dummy we count as a Creature, because weapons can target it and bees can attack it. In contrast, Armor Stand we count as Inanimate, because nothing should ever attack or target it.
             </summary>
         </member>
         <member name="F:Vintagestory.API.Common.Entities.Entity.PhysicsUpdateWatcher">
@@ -10628,6 +10707,11 @@
         <member name="F:Vintagestory.API.Common.Entities.EntityProperties.FallDamage">
             <summary>
             Whether the entity should take fall damage
+            </summary>
+        </member>
+        <member name="F:Vintagestory.API.Common.Entities.EntityProperties.FallDamageMultiplier">
+            <summary>
+            If less than one, mitigates fall damage (e.g. could be used for mountainous creatures); if more than one, increases fall damage (e.g fragile creatures?)
             </summary>
         </member>
         <member name="F:Vintagestory.API.Common.Entities.EntityProperties.RotateModelOnClimb">
@@ -15357,6 +15441,11 @@
             Fired when something triggers a discovery event, such as the lore system
             </summary>
         </member>
+        <member name="E:Vintagestory.API.Client.IClientEventAPI.ColorsPresetChanged">
+            <summary>
+            Fired when the GuiColorsPreset client setting is changed, since meshes may need to be redrawn
+            </summary>
+        </member>
         <member name="M:Vintagestory.API.Client.IClientEventAPI.RegisterRenderer(Vintagestory.API.Client.IRenderer,Vintagestory.API.Client.EnumRenderStage,System.String)">
             <summary>
             Registers a rendering handler to be called during every render frame
@@ -15806,6 +15895,28 @@
             Exactly like PlaySoundAt except that it returns the duration of the played sound.  (We don't want to change the method signature of PlaySoundAt for API mod breakage reasons)
             </summary>
         </member>
+        <member name="T:Vintagestory.API.Client.IColorPresets">
+            <summary>
+            Facilitates the Accessibility tab wireframe colors setting.  Offers three preset color options, "Default", "Preset2" and "Preset3". The selection between these three options is chosen by the ClientSettings int value "guiColorsPreset".
+            Within these presets, individual color values are stored by string key.
+            </summary>
+        </member>
+        <member name="M:Vintagestory.API.Client.IColorPresets.Initialize(Vintagestory.API.Common.IAsset)">
+            <summary>
+            Mods (e.g. VSSurvivalMod) can call this to insert into the presets their configured color keys and values, which will be specific to mod content
+            </summary>
+            <param name="asset"></param>
+        </member>
+        <member name="M:Vintagestory.API.Client.IColorPresets.OnUpdateSetting">
+            <summary>
+            To be called when the ClientSetting "guiColorsPreset" is changed
+            </summary>
+        </member>
+        <member name="M:Vintagestory.API.Client.IColorPresets.GetColor(System.String)">
+            <summary>
+            Called to fetch a color value from the currently selected preset colors
+            </summary>
+        </member>
         <member name="T:Vintagestory.API.Client.ICoreClientAPI">
             <summary>
             The core api implemented by the client. The main interface for accessing the client. Contains all sub components and some miscellaneous methods.
@@ -15919,6 +16030,11 @@
         <member name="P:Vintagestory.API.Client.ICoreClientAPI.EntityTextureAtlas">
             <summary>
             API for the Entity Texture Atlas
+            </summary>
+        </member>
+        <member name="P:Vintagestory.API.Client.ICoreClientAPI.ColorPreset">
+            <summary>
+            Fetch color configs, used for accessibility e.g. for knapping wireframe gridlines
             </summary>
         </member>
         <member name="P:Vintagestory.API.Client.ICoreClientAPI.Shader">
@@ -18412,6 +18528,11 @@
             Developer tools
             </summary>
         </member>
+        <member name="F:Vintagestory.API.Client.HotkeyType.MouseControls">
+            <summary>
+            Primary mouse controls
+            </summary>
+        </member>
         <member name="F:Vintagestory.API.Client.HotKey.IsGlobalHotkey">
             <summary>
             For global hotkeys that shall not be blocked by anything (e.g. F11 for fullscreen, F12 for screenshot)
@@ -18452,6 +18573,11 @@
             This is the action that happens when the hotkey is used.
             </summary>
         </member>
+        <member name="F:Vintagestory.API.Client.HotKey.TriggerOnUpAlso">
+            <summary>
+            If true, the handler will be called twice, once on the key or button down event, and once on the up event
+            </summary>
+        </member>
         <member name="M:Vintagestory.API.Client.HotKey.DidPress(Vintagestory.API.Client.KeyEvent,Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.Common.IPlayer,System.Boolean)">
             <summary>
             Was this hotkey pressed?
@@ -18461,6 +18587,12 @@
             <param name="player">The player that pressed the buttons.</param>
             <param name="allowCharacterControls">Do we allow character control functions.</param>
             <returns>If the hotkey was pressed or not.</returns>
+        </member>
+        <member name="M:Vintagestory.API.Client.HotKey.MouseControlsIgnoreModifiers">
+            <summary>
+            If this hotkey is a mouse control (primary or secondary mouse click), and this hotkey does not specifically require modifiers, then let's ignore modifiers when matching, because Shift+click or Ctrl+click is common; Alt+click might be used if Alt is being held
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:Vintagestory.API.Client.HotKey.FallbackDidPress(Vintagestory.API.Client.KeyEvent,Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.Common.IPlayer,System.Boolean)">
             <summary>
@@ -18485,12 +18617,17 @@
         </member>
         <member name="T:Vintagestory.API.Client.KeyCombination">
             <summary>
-            Mapping of a key combination
+            Mapping of an input key combination.   Note: the "key" might also be a mouse button if a hotkey has been configured to be activated by a mouse button
+            </summary>
+        </member>
+        <member name="F:Vintagestory.API.Client.KeyCombination.MouseStart">
+            <summary>
+            The first keycode representing a mouse button
             </summary>
         </member>
         <member name="F:Vintagestory.API.Client.KeyCombination.KeyCode">
             <summary>
-            The KeyCode
+            The KeyCode (from 1.19.4, the keycodes map to either keys or mouse buttons)
             </summary>
         </member>
         <member name="F:Vintagestory.API.Client.KeyCombination.SecondKeyCode">
@@ -18600,7 +18737,7 @@
             Am I handled?
             </summary>
         </member>
-        <member name="M:Vintagestory.API.Client.MouseEvent.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,Vintagestory.API.Common.EnumMouseButton)">
+        <member name="M:Vintagestory.API.Client.MouseEvent.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,Vintagestory.API.Common.EnumMouseButton,System.Int32)">
             <summary>
             This is apparently used for mouse move events (set to true if the mouse state has changed during constant polling, set to false if the move event came from opentk. This emulated state is apparantly used to determine the correct delta position to turn the camera.
             </summary>
@@ -18913,6 +19050,34 @@
             The number of model pools in this master manager.
             </summary>
             <returns>The number of model pools</returns>
+        </member>
+        <member name="T:Vintagestory.API.Client.MeshDataRecycler">
+            <summary>
+            This is a recycling system for MeshData objects, so that they can be re-used: helps performance by easing memory allocation pressure, at the cost of holding typically around 300-400MB of memory for these recycled objects
+            </summary>
+        </member>
+        <member name="M:Vintagestory.API.Client.MeshDataRecycler.GetOrCreateMesh(System.Int32)">
+            <summary>
+            Gets or creates a MeshData with basic data fields already allocated (may contain junk data) and capacity (VerticesMax) at least equal to minimumVertices; in MeshData created/recycled using this system, IndicesMax will be fixed equal to VerticesMax * 6 / 4
+            </summary>
+            <param name="minimumVertices"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Client.MeshDataRecycler.DoRecycling">
+            <summary>
+            Call this periodically on the same thread which will call GetOrCreateMesh, this is required to ensure the Recycling system is up to date
+            </summary>
+        </member>
+        <member name="M:Vintagestory.API.Client.MeshDataRecycler.Recycle(Vintagestory.API.Client.MeshData)">
+            <summary>
+            Offer this MeshData to the recycling system: it will first be queued for recycling, and later processed to be either recycled or disposed of
+            </summary>
+            <param name="meshData"></param>
+        </member>
+        <member name="M:Vintagestory.API.Client.MeshDataRecycler.Dispose">
+            <summary>
+            Dispose of the MeshDataRecycler (normally on game exit, but can also be used to disable further use of it)
+            </summary>
         </member>
         <member name="F:Vintagestory.API.Client.CubeMeshUtil.CloudSideShadings">
             <summary>
@@ -19530,6 +19695,16 @@
             Amount of assigned render pass values
             </summary>
         </member>
+        <member name="F:Vintagestory.API.Client.MeshData.Recyclable">
+            <summary>
+            If true, this MeshData was constructed from MeshDataRecycler
+            </summary>
+        </member>
+        <member name="F:Vintagestory.API.Client.MeshData.RecyclingTime">
+            <summary>
+            The time this MeshData most recently entered the recycling system; the oldest may be garbage collected
+            </summary>
+        </member>
         <member name="M:Vintagestory.API.Client.MeshData.GetVerticesCount">
             <summary>
             Gets the number of verticies in the the mesh.
@@ -19687,6 +19862,12 @@
             <param name="withRgba"></param>
             <param name="withFlags"></param>
         </member>
+        <member name="M:Vintagestory.API.Client.MeshData.#ctor(System.Int32)">
+            <summary>
+            This constructor creates a basic MeshData with xyz, Uv, Rgba, Flags and Indices only; Indices to Vertices ratio is the default 6:4
+            </summary>
+            <param name="capacity"></param>
+        </member>
         <member name="M:Vintagestory.API.Client.MeshData.WithColorMaps">
             <summary>
             Sets up the tints array for holding tint info
@@ -19807,6 +19988,17 @@
             <param name="color"></param>
             <param name="flags"></param>
         </member>
+        <member name="M:Vintagestory.API.Client.MeshData.AddVertexWithFlagsSkipColor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Int32)">
+            <summary>
+            Adds a new vertex to the mesh. Grows the vertex buffer if necessary.
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="z"></param>
+            <param name="u"></param>
+            <param name="v"></param>
+            <param name="flags"></param>
+        </member>
         <member name="M:Vintagestory.API.Client.MeshData.SetVertexFlags(System.Int32)">
             <summary>
             Applies a vertex flag to an existing MeshData (uses binary OR)
@@ -19826,6 +20018,17 @@
             </summary>
             <param name="facing"></param>
         </member>
+        <member name="M:Vintagestory.API.Client.MeshData.AddIndices(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Add 6 indices
+            </summary>
+            <param name="i1"></param>
+            <param name="i2"></param>
+            <param name="i3"></param>
+            <param name="i4"></param>
+            <param name="i5"></param>
+            <param name="i6"></param>
+        </member>
         <member name="M:Vintagestory.API.Client.MeshData.GrowVertexBuffer">
             <summary>
             Doubles the size of the xyz, uv, rgba, rgba2 and flags arrays
@@ -19841,6 +20044,23 @@
             Creates a compact, deep copy of the mesh
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Client.MeshData.CloneBasicData">
+            <summary>
+            Clone the basic xyz, uv, rgba and flags arrays, which are common to every chunk mesh (though not necessarily all used by individual block/item/entity models)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Client.MeshData.CloneExtraData(Vintagestory.API.Client.MeshData)">
+            <summary>
+            Clone the extra mesh data fields. Some of these fields are used only by block/item meshes (some only be Microblocks). Some others are not used by all chunk meshes, though may be used by certain meshes in certain renderpasses (e.g. CustomInts). Either way, cannot sensibly be retained within the MeshDataRecycler system, must be cloned every time
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Client.MeshData.Dispose">
+            <summary>
+            Allows meshdata object to be returned to the recycler
+            </summary>
         </member>
         <member name="M:Vintagestory.API.Client.MeshData.EmptyClone">
             <summary>
@@ -20959,9 +21179,9 @@
             </summary>
         </member>
         <member name="M:Vintagestory.API.Client.GuiDialog.OnLevelFinalize">
-            <summary>
+             <summary>
             
-            </summary>
+             </summary>
         </member>
         <member name="P:Vintagestory.API.Client.GuiDialog.DrawOrder">
             <summary>
@@ -21064,7 +21284,7 @@
         </member>
         <member name="M:Vintagestory.API.Client.GuiDialog.OnKeyDown(Vintagestory.API.Client.KeyEvent)">
             <summary>
-            Fires when keys are held down.  
+            Fires when keys are held down.
             </summary>
             <param name="args">The key or keys that were held down.</param>
         </member>
@@ -21163,13 +21383,19 @@
         </member>
         <member name="M:Vintagestory.API.Client.GuiDialog.CaptureAllInputs">
             <summary>
-            Should this dialogue capture all the keyboard events (IE: textbox) except for escape.
+            Should this dialog (e.g. textbox) capture all the keyboard events except for escape.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Client.GuiDialog.CaptureRawMouse">
+            <summary>
+            Should this dialog capture the raw mouse button clicks - useful for example for the settings menu itself (in case the user has unset them or set them to something crazy)
             </summary>
             <returns></returns>
         </member>
         <member name="M:Vintagestory.API.Client.GuiDialog.Dispose">
             <summary>
-            Disposes the Dialogue.
+            Disposes the Dialog.
             </summary>
         </member>
         <member name="M:Vintagestory.API.Client.GuiDialog.ClearComposers">
@@ -21181,6 +21407,13 @@
             <summary>
             The key combination string that toggles this GUI object.
             </summary>
+        </member>
+        <member name="M:Vintagestory.API.Client.GuiDialog.IsInRangeOf(Vintagestory.API.MathTools.Vec3d)">
+            <summary>
+            Checks if the player is in range (pickingrange) of the given position
+            </summary>
+            <param name="pos"></param>
+            <returns>In range or no?</returns>
         </member>
         <member name="T:Vintagestory.API.Client.GuiDialogBlockEntity">
             <summary>
@@ -24382,7 +24615,7 @@
         </member>
         <member name="P:Vintagestory.API.Client.RichTextComponentBase.UnscaledMarginTop">
             <summary>
-            This will be the Y-Advance into the next line. Unscaled value.
+            This will be the Y-Advance into the next line. Unscaled value. Also used as the offset with EnumVerticalAlign.FixedOffset
             </summary>
         </member>
         <member name="P:Vintagestory.API.Client.RichTextComponentBase.PaddingRight">
@@ -25500,6 +25733,49 @@
             <typeparam name="T"></typeparam>
             <param name="data"></param>
             <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Util.StringUtil.IndexOfOrdinal(System.String,System.String)">
+            <summary>
+            IMPORTANT!   This method should be used for every IndexOf operation in our code (except possibly in localised output to the user). This is important in order to avoid any
+            culture-specific different results even when indexing GLSL shader code or other code strings, etc., or other strings in English, when the current culture is a different language
+            (Known issue in the Thai language which has no spaces and treats punctuation marks as invisible, see https://github.com/dotnet/runtime/issues/59120)
+            <br/>See also: https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Util.StringUtil.StartsWithOrdinal(System.String,System.String)">
+            <summary>
+            IMPORTANT!   This method should be used for every StartsWith operation in our code (except possibly in localised output to the user). This is important in order to avoid any
+            culture-specific different results even when examining strings in English, when the user machine's current culture is a different language
+            (Known issue in the Thai language which has no spaces and treats punctuation marks as invisible, see https://github.com/dotnet/runtime/issues/59120)
+            <br/>See also: https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Util.StringUtil.EndsWithOrdinal(System.String,System.String)">
+            <summary>
+            IMPORTANT!   This method should be used for every EndsWith operation in our code (except possibly in localised output to the user). This is important in order to avoid any
+            culture-specific different results even when examining strings in English, when the user machine's current culture is a different language
+            (Known issue in the Thai language which has no spaces and treats punctuation marks as invisible, see https://github.com/dotnet/runtime/issues/59120)
+            <br/>See also: https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vintagestory.API.Util.StringUtil.CompareOrdinal(System.String,System.String)">
+            <summary>
+            This should be used for every string comparison when ordering strings (except possibly in localised output to the user) in order to avoid any
+            culture specific string comparison issues in certain languages (worst in the Thai language which has no spaces and treats punctuation marks as invisible)
+            <br/>See also: https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
             <returns></returns>
         </member>
         <member name="M:Vintagestory.API.Util.StringUtil.UcFirst(System.String)">
@@ -26900,6 +27176,11 @@
             <param name="key"></param>
             <returns></returns>
         </member>
+        <member name="P:Vintagestory.API.Datastructures.OrderedDictionary`2.Values">
+            <summary>
+            Important: these are NOT ordered.   The ordered values is obtained by .ValuesOrdered
+            </summary>
+        </member>
         <member name="M:Vintagestory.API.Datastructures.OrderedDictionary`2.AddRange(System.Collections.Generic.Dictionary{`0,`1},Vintagestory.API.Common.ILogger)">
             <summary>
             Adds values, but for performance does not replace any existing values which have the same key; that's fine for asset loading
@@ -27498,8 +27779,17 @@
         <member name="M:Vintagestory.API.MathTools.BlockFacing.IterateThruFacingOffsets(Vintagestory.API.MathTools.BlockPos)">
             <summary>
             Successive calls to this when looping through the standard six BlockFacings will set pos to the relevant facing offset from the original position<br/>
-            NOTE: this modifies the fields of the pos parameter
+            NOTE: this modifies the fields of the pos parameter, which is better for heap usage than creating a new BlockPos object for each iteration
+            <br/>If necessary to restore the original blockPos value, call FinishIteratingAllFaces(pos)
             </summary>
+            <param name="pos"></param>
+        </member>
+        <member name="M:Vintagestory.API.MathTools.BlockFacing.FinishIteratingAllFaces(Vintagestory.API.MathTools.BlockPos)">
+            <summary>
+            Restores the original value of pos, if we are certain we looped through ALLFACES using IterateThruFacingOffsets
+            Note: if for any reason control might have exited the loop early, this cannot sensibly be used
+            </summary>
+            <param name="pos"></param>
         </member>
         <member name="M:Vintagestory.API.MathTools.BlockFacing.GetFaceBrightness(System.Double[],System.Single[])">
             <summary>
@@ -29295,6 +29585,13 @@
             <param name="end"></param>
             <returns></returns>
         </member>
+        <member name="M:Vintagestory.API.MathTools.GameMath.NormaliseAngleRad(System.Single)">
+            <summary>
+            For angles in radians, normalise to the range 0 to 2 * PI and also, if barely close to a right angle, set it to a right angle (fixes loss of precision after multiple rotation operations etc.)
+            </summary>
+            <param name="angleRad"></param>
+            <returns></returns>
+        </member>
         <member name="M:Vintagestory.API.MathTools.GameMath.Smallest(System.Double,System.Double)">
             <summary>
             Returns the smallest number, ignoring the sign of either value. Examples:<br/>
@@ -30685,6 +30982,16 @@
             <param name="rad">{Number} rad the angle to rotate the matrix by</param>
             <returns>{mat4} out</returns>
         </member>
+        <member name="M:Vintagestory.API.MathTools.Mat4f.RotateXYZ(System.Span{System.Single},System.Single,System.Single,System.Single)">
+            <summary>
+            Provides a composite rotation matrix, equivalent to RotateX followed by RotateY followed by RotateZ
+            <br/>Here we work on a Span (which may be on the stack) for higher performance
+            </summary>
+            <param name="matrix"></param>
+            <param name="radX"></param>
+            <param name="radY"></param>
+            <param name="radZ"></param>
+        </member>
         <member name="M:Vintagestory.API.MathTools.Mat4f.FromRotationTranslation(System.Single[],System.Single[],System.Single[])">
             <summary>
             Creates a matrix from a quaternion rotation and vector translation
@@ -30765,6 +31072,11 @@
             <returns></returns>
         </member>
         <member name="M:Vintagestory.API.MathTools.Mat4f.MulWithVec3(System.Single[],System.Single[],System.Single[])">
+            <summary>
+            Used for vec3 representing a direction or normal - as a vec4 this would have the 4th element set to 0, so that applying a matrix transform with a translation would have *no* effect
+            </summary>
+        </member>
+        <member name="M:Vintagestory.API.MathTools.Mat4f.MulWithVec3(System.Span{System.Single},System.Single[],System.Single[])">
             <summary>
             Used for vec3 representing a direction or normal - as a vec4 this would have the 4th element set to 0, so that applying a matrix transform with a translation would have *no* effect
             </summary>

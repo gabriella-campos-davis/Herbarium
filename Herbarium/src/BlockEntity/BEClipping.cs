@@ -95,25 +95,32 @@ namespace herbarium
         private void DoGrow(string state){ //this contains the worst code ever written, please fix
             ICoreServerAPI sapi = Api as ICoreServerAPI;
 
-            if(state == "alive")
+            try
             {
-                Block newBushBlock = Api.World.GetBlock(AssetLocation.Create(bushCode));
-                
-                if (newBushBlock is null) return;
+                if(state == "alive")
+                {
+                    Block newBushBlock = Api.World.GetBlock(AssetLocation.Create(bushCode));
+                    
+                    if (newBushBlock is null) return;
 
-                Api.World.BlockAccessor.SetBlock(newBushBlock.BlockId, Pos);
-            }
+                    Api.World.BlockAccessor.SetBlock(newBushBlock.BlockId, Pos);
+                }
 
-            if(state == "dead")
+                if(state == "dead")
+                {
+                    Block deadClippingBlock;
+
+                    bushType = this.Block.Variant["type"].ToString();
+
+                    deadClippingBlock = Api.World.GetBlock(AssetLocation.Create(this.Block.Code.FirstCodePart() + bushType + "-dead", block.Code.Domain));
+                    if (deadClippingBlock is null) return;
+
+                    Api.World.BlockAccessor.SetBlock(deadClippingBlock.BlockId, Pos);
+                }
+            } 
+            catch(Exception) 
             {
-                Block deadClippingBlock;
-
-                bushType = this.Block.Variant["type"].ToString();
-
-                deadClippingBlock = Api.World.GetBlock(AssetLocation.Create(this.Block.Code.FirstCodePart() + bushType + "-dead", block.Code.Domain));
-                if (deadClippingBlock is null) return;
-
-                Api.World.BlockAccessor.SetBlock(deadClippingBlock.BlockId, Pos);
+                ;
             }
         }
 
