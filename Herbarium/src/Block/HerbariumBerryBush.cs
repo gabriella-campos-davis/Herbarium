@@ -96,7 +96,8 @@ namespace herbarium
                     return true;
                 } 
             }
-            return false; 
+            return true; 
+            //return base.OnBlockInteractStart(world, byPlayer, blockSel);
         }
 
         void GiveClipping(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)

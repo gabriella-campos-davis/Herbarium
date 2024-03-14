@@ -18476,12 +18476,12 @@
             </summary>
         </member>
         <member name="T:Vintagestory.API.Client.GlKeys">
-            <summary>
-            Internally the game uses OpenTK and their Keys are by default mapped to US QWERTY Keyboard layout which the GlKeys also do.
-            Upon typing text in a Text input field it will produce the correct characters according to your keyboard layout.
+             <summary>
+             Internally the game uses OpenTK and their Keys are by default mapped to US QWERTY Keyboard layout which the GlKeys also do.
+             Upon typing text in a Text input field it will produce the correct characters according to your keyboard layout.
             
-            If you need to get the character for the current Keyboard layout use <see cref="M:Vintagestory.API.Client.GlKeyNames.GetKeyName(Vintagestory.API.Client.GlKeys)"/>
-            </summary>
+             If you need to get the character for the current Keyboard layout use <see cref="M:Vintagestory.API.Client.GlKeyNames.GetKeyName(Vintagestory.API.Client.GlKeys)"/>
+             </summary>
         </member>
         <member name="F:Vintagestory.API.Client.HotkeyType.HelpAndOverlays">
             <summary>
@@ -21063,6 +21063,13 @@
             Creates a white text for smallish dialogs.
             </summary>
             <returns>The white text for small dialogs.</returns>
+        </member>
+        <member name="M:Vintagestory.API.Client.CairoFont.WhiteSmallishText(System.String)">
+            <summary>
+            Creates a white text for smallish dialogs, using the specified base font
+            </summary>
+            <param name="baseFont"></param>
+            <returns></returns>
         </member>
         <member name="M:Vintagestory.API.Client.CairoFont.WhiteSmallText">
             <summary>
