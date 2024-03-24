@@ -233,39 +233,45 @@ namespace herbarium
 
         bool DoGrow()
         {
-            if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > Api.World.Calendar.DaysPerYear)
+            try
             {
-                Pruned = false;
-            }
+                if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > Api.World.Calendar.DaysPerYear)
+                {
+                    Pruned = false;
+                }
 
-            Block block = Api.World.BlockAccessor.GetBlock(Pos);
-            string nowCodePart = block.LastCodePart();
-            string nextCodePart = (nowCodePart == "empty") ? "flowering" : ((nowCodePart == "flowering") ? "ripe" : "empty");
+                Block block = Api.World.BlockAccessor.GetBlock(Pos);
+                string nowCodePart = block.LastCodePart();
+                string nextCodePart = (nowCodePart == "empty") ? "flowering" : ((nowCodePart == "flowering") ? "ripe" : "empty");
 
 
-            AssetLocation loc = block.CodeWithParts(nextCodePart);
-            if (!loc.Valid)
+                AssetLocation loc = block.CodeWithParts(nextCodePart);
+                if (!loc.Valid)
+                {
+                    Api.World.BlockAccessor.RemoveBlockEntity(Pos);
+                    return false;
+                }
+
+                Block nextBlock = Api.World.GetBlock(loc);
+                if (nextBlock?.Code == null) return false;
+
+                if (nextCodePart == "ripe" && (Api.World.BlockAccessor.GetBlock(Pos.DownCopy()) is not HerbariumBerryBush) && 
+                    Api.World.BlockAccessor.GetBlock(Pos.UpCopy()).BlockMaterial == EnumBlockMaterial.Air) 
+                {
+                    Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
+                    if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());
+                }
+
+                Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
+
+                MarkDirty(true);
+                return true;
+            } 
+            catch
             {
-                Api.World.BlockAccessor.RemoveBlockEntity(Pos);
                 return false;
             }
-
-            Block nextBlock = Api.World.GetBlock(loc);
-            if (nextBlock?.Code == null) return false;
-
-            if (nextCodePart == "ripe" && (Api.World.BlockAccessor.GetBlock(Pos.DownCopy()) is not HerbariumBerryBush) && 
-                Api.World.BlockAccessor.GetBlock(Pos.UpCopy()).BlockMaterial == EnumBlockMaterial.Air) 
-            {
-                Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
-                if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());
-            }
-
-            Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
-
-            MarkDirty(true);
-            return true;
         }  
-
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
         {
             base.FromTreeAttributes(tree, worldForResolving);

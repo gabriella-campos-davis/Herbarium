@@ -3,6 +3,7 @@ D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\assets\herbarium\lang
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\assets\herbarium\lang\es-es.json
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\assets\herbarium\lang\fr.json
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\assets\herbarium\lang\ru.json
+D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\assets\herbarium\sounds\branch_trim.ogg
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\assets\herbarium\sounds\branch_trim_new.ogg
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\modicon.png
 D:\VSMods\Herbarium\Herbarium\bin\Release\Mods\mod\publish\modinfo.json

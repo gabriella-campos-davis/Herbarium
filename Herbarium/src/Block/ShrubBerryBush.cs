@@ -7,6 +7,7 @@ using Vintagestory.GameContent;
 using System.Linq;
 using Vintagestory.API.Common.Entities;
 using herbarium.config;
+using System;
 
 namespace herbarium
 {
@@ -18,6 +19,19 @@ namespace herbarium
     public class ShrubBerryBush : HerbariumBerryBush
     {
         MeshData[] prunedmeshes;
+        string[] prunedMeshFaces;
+        string[] fruitingFaces;
+
+        public override void OnLoaded(ICoreAPI api)
+        {
+            base.OnLoaded(api);
+
+            prunedMeshFaces = Attributes["prunedMeshFaces"].AsObject<String[]>(null);
+            fruitingFaces = Attributes["fruitingFaces"].AsObject<String[]>(null);
+
+            if (api.Side != EnumAppSide.Client) return;
+            ICoreClientAPI capi = api as ICoreClientAPI;
+        }
 
         new public MeshData GetPrunedMesh(BlockPos pos)
         {
@@ -35,13 +49,14 @@ namespace herbarium
 
             prunedmeshes = new MeshData[Shape.BakedAlternates.Length];
 
-            var selems = new string[] { "Stem1/Leaves", "Stem1/Leaves2", "Stem3/Leaves5", "Stem3/Leaves6", "Stem1/Berries", "Stem1/Berries2", "Stem3/Berries5", "Stem3/Berries6"};
+            var selems = prunedMeshFaces;
+            //if (fruitingFaces is null) return;
             if (State == "empty")
             {
-                selems = selems.Remove("Stem1/Berries");
-                selems = selems.Remove("Stem1/Berries2");
-                selems = selems.Remove("Stem3/Berries5");
-                selems = selems.Remove("Stem3/Berries6");
+                for(int j = 0; j < fruitingFaces.Length; j++)
+                {
+                    selems = selems.Remove(fruitingFaces[j]);
+                }
             } 
 
             for (int i = 0; i < Shape.BakedAlternates.Length; i++)
