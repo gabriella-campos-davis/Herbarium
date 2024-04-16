@@ -255,11 +255,23 @@ namespace herbarium
                 Block nextBlock = Api.World.GetBlock(loc);
                 if (nextBlock?.Code == null) return false;
 
-                if (nextCodePart == "ripe" && (Api.World.BlockAccessor.GetBlock(Pos.DownCopy()) is not HerbariumBerryBush) && 
-                    Api.World.BlockAccessor.GetBlock(Pos.UpCopy()).BlockMaterial == EnumBlockMaterial.Air) 
+                
+
+                if(nextCodePart == "ripe" && Api.World.BlockAccessor.GetBlock(Pos.UpCopy()).BlockMaterial == EnumBlockMaterial.Air)
                 {
-                    Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
-                    if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());
+                    if(block.Attributes["isLarge"].AsBool() && Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes["isBottomBlock"].AsBool())
+                    {
+                        if(Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)) is not HerbariumBerryBush)
+                        {
+                            Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
+                            if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());  
+                        }
+                    }
+                    if (Api.World.BlockAccessor.GetBlock(Pos.DownCopy()) is not HerbariumBerryBush) 
+                    {
+                        Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
+                        if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());
+                    }  
                 }
 
                 Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);

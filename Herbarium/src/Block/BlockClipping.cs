@@ -28,14 +28,23 @@ namespace herbarium
             BlockEntity belowBlockEntity = blockAccessor.GetBlockEntity(pos.DownCopy());
 
             Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
+            BlockEntity belowBelowBlockEntity = blockAccessor.GetBlockEntity(pos.DownCopy(2));
+
+
+            Block belowBelowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(3));
 
             BlockEntity betallbush = new BETallBerryBush();
 
-            if (belowBlock.Fertility > 0) return true;
+           if (belowBlock.Fertility > 0) return true; //we're on ground, we can all be here
             if (belowBlock is HerbariumBerryBush || belowBlock is PricklyBerryBush)
             {
                 if(belowBlockEntity is BETallBerryBush && blockEntity is BETallBerryBush)
                 {
+                    if(belowBlock.Attributes["isLarge"].AsBool())
+                    {
+                        if(belowBelowBelowBlock.Fertility > 0) return true;
+                        return false;
+                    }
                     if(belowBelowBlock.Fertility > 0) return true;
                     return false;
                 }

@@ -20,42 +20,19 @@ namespace herbarium
         AssetLocation harvestedSound = AssetLocation.Create("herbarium:sounds/branch_trim");
         AssetLocation harvestingSound = AssetLocation.Create("game:sounds/walk/inside/leafy/bushrustle4");
         MeshData[] prunedmeshes;
+        string[] prunedMeshFaces;
+        string[] fruitingFaces;
         float harvestTime = 0.6f;
 
         public string State => Variant["state"];
         public string Type => Variant["type"];
-
-        public MeshData GetPrunedMesh(BlockPos pos)
-        {
-            if (api == null) return null;
-            if (prunedmeshes == null) genPrunedMeshes();
-
-            int rnd = RandomizeAxes == EnumRandomizeAxes.XYZ ? GameMath.MurmurHash3Mod(pos.X, pos.Y, pos.Z, prunedmeshes.Length) : GameMath.MurmurHash3Mod(pos.X, 0, pos.Z, prunedmeshes.Length);
-
-            return prunedmeshes[rnd];
-        }
-
-        private void genPrunedMeshes()
-        {
-            var capi = api as ICoreClientAPI;
-
-            prunedmeshes = new MeshData[Shape.BakedAlternates.Length];
-
-            var selems = new string[] { "Berries", "branchesN", "branchesS", "Leaves" };
-            if (State == "empty") selems = selems.Remove("Berries");
-
-            for (int i = 0; i < Shape.BakedAlternates.Length; i++)
-            {
-                var cshape = Shape.BakedAlternates[i];
-                var shape = capi.TesselatorManager.GetCachedShape(cshape.Base);
-                capi.Tesselator.TesselateShape(this, shape, out prunedmeshes[i], this.Shape.RotateXYZCopy, null, selems);
-            }
-        }
-
         
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
+
+            prunedMeshFaces = Attributes["prunedMeshFaces"].AsObject<String[]>(null);
+            fruitingFaces = Attributes["fruitingFaces"].AsObject<String[]>(null);
 
             if (api.Side != EnumAppSide.Client) return;
             ICoreClientAPI capi = api as ICoreClientAPI;
@@ -96,6 +73,40 @@ namespace herbarium
                 };
             });
         }
+        public MeshData GetPrunedMesh(BlockPos pos)
+        {
+            if (api == null) return null;
+            if (prunedmeshes == null) genPrunedMeshes();
+
+            int rnd = RandomizeAxes == EnumRandomizeAxes.XYZ ? GameMath.MurmurHash3Mod(pos.X, pos.Y, pos.Z, prunedmeshes.Length) : GameMath.MurmurHash3Mod(pos.X, 0, pos.Z, prunedmeshes.Length);
+
+            return prunedmeshes[rnd];
+        }
+
+        private void genPrunedMeshes()
+        {
+            var capi = api as ICoreClientAPI;
+
+            prunedmeshes = new MeshData[Shape.BakedAlternates.Length];
+
+            var selems = prunedMeshFaces;
+            //if (fruitingFaces is null) return;
+            if (State == "empty")
+            {
+                for(int j = 0; j < fruitingFaces.Length; j++)
+                {
+                    selems = selems.Remove(fruitingFaces[j]);
+                }
+            } 
+
+            for (int i = 0; i < Shape.BakedAlternates.Length; i++)
+            {
+                var cshape = Shape.BakedAlternates[i];
+                var shape = capi.TesselatorManager.GetCachedShape(cshape.Base);
+                capi.Tesselator.TesselateShape(this, shape, out prunedmeshes[i], this.Shape.RotateXYZCopy, null, selems);
+            }
+        }
+
 
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {         
@@ -234,10 +245,15 @@ namespace herbarium
             if(Attributes["stackable"].AsBool() is true)
             {
                 Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
+                Block belowBelowBelowblock = blockAccessor.GetBlock(pos.DownCopy(3));
                 if(belowBelowBlock is null) return false;
                 if(belowBelowBlock.Attributes is null) return false;
                 if(belowBlock.BlockMaterial == EnumBlockMaterial.Air) return false;
                 if(belowBlock.Attributes["stackable"].AsBool() is true && belowBelowBlock.Fertility > 0)
+                {
+                    return true;
+                }
+                if(Attributes["isLarge"].AsBool() && belowBelowBelowblock.Fertility > 0)
                 {
                     return true;
                 }

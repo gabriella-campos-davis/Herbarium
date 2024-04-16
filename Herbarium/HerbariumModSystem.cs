@@ -54,6 +54,7 @@ namespace herbarium
             api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
             api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEShrubBerryBush));
             api.RegisterBlockEntityClass("BETallBerryBush", typeof(BETallBerryBush));
+            api.RegisterBlockEntityClass("BELargeBerryBush", typeof(BELargeBerryBush));
             api.RegisterBlockEntityClass("BEClipping", typeof(BEClipping));
             api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
             api.RegisterBlockEntityClass("BESeedling", typeof(BESeedling));

@@ -18,3 +18,4 @@ D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\assets\herbarium\lang\es-419.js
 D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\assets\herbarium\lang\es-es.json
 D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\assets\herbarium\lang\fr.json
 D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\assets\herbarium\lang\ru.json
+D:\VSMods\Herbarium\Herbarium\bin\Debug\Mods\mod\assets\herbarium\sounds\branch_trim.ogg
