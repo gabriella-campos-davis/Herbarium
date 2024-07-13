@@ -1,20 +1,18 @@
+using  System;
 namespace herbarium.config
 {
     class HerbariumConfig 
     {
-        public bool plantsCanDamage = true;
-        public bool plantsCanPoison = true;
+        public Nullable<bool> plantsCanDamage = true;
+        public Nullable<bool> plantsCanPoison = true;
         public string[] plantsWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
-
-        public bool poulticeHealOverTime = true;
-
-        public bool berryBushCanDamage = true;
-        public float berryBushDamage = 0.5f;
-        public float berryBushDamageTick = 0.7f;
+        public Nullable<bool> poulticeHealOverTime = true;
+        public Nullable<bool> berryBushCanDamage = true;
+        public Nullable<float> berryBushDamage = 0.5f;
+        public Nullable<float> berryBushDamageTick = 0.7f;
         public string[] berryBushWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
-        public bool useKnifeForClipping = true;
-        public bool useShearsForClipping = true;
-
+        public Nullable<bool> useKnifeForClipping = true;
+        public Nullable<bool> useShearsForClipping = true;
 
         public HerbariumConfig()
         {}

@@ -11,8 +11,6 @@ namespace herbarium
 {
     public class HerbariumPoultice : ItemPoultice
     {
-        HerbariumConfig config = new();
-
          public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
             byEntity.World.RegisterCallback((dt) =>
@@ -51,7 +49,7 @@ namespace herbarium
 
                 double time = 8 - secondaryHealth;
 
-                bool isHealingOverTimeEnabled = HerbariumConfig.Current.poulticeHealOverTime;
+                bool isHealingOverTimeEnabled = HerbariumConfig.Current.poulticeHealOverTime.Value;
 
                 /*
                 following line for vanilla poultice health attributes. 

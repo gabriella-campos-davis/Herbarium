@@ -47,6 +47,9 @@ namespace herbarium
 
             api.RegisterBlockClass("BlockRequiresGravelOrSand", typeof(BlockRequiresGravelOrSand));
 
+            api.RegisterBlockClass("BlockPricklyLeaves", typeof(BlockPricklyLeaves));
+            api.RegisterBlockClass("BlockLeavesDropCanes", typeof(BlockLeavesDropCanes));
+
             api.RegisterBlockClass("GiantKelp", typeof(GiantKelp));
 
             api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestMultiple));
@@ -104,7 +107,6 @@ namespace herbarium
                 if (HerbariumConfig.Current.poulticeHealOverTime == null)
                     HerbariumConfig.Current.poulticeHealOverTime = HerbariumConfig.GetDefault().poulticeHealOverTime;
 
-
                 if (HerbariumConfig.Current.berryBushCanDamage == null)
                     HerbariumConfig.Current.berryBushCanDamage = HerbariumConfig.GetDefault().berryBushCanDamage;
 
@@ -123,7 +125,7 @@ namespace herbarium
                 if (HerbariumConfig.Current.useShearsForClipping == null)
                     HerbariumConfig.Current.useShearsForClipping = HerbariumConfig.GetDefault().useShearsForClipping;
 
-                api.StoreModConfig(HerbariumConfig.Current, "HerbariumConfig.json");
+                api.StoreModConfig(HerbariumConfig.Current, "herbariumconfig.json");
             }
         }
 

@@ -45,16 +45,16 @@ namespace herbarium
                     if (item.Code == null)
                         continue;
 
-                    if(HerbariumConfig.Current.useKnifeForClipping && !HerbariumConfig.Current.useShearsForClipping && item.Tool == EnumTool.Knife)
+                    if(HerbariumConfig.Current.useKnifeForClipping.Value && !HerbariumConfig.Current.useShearsForClipping.Value && item.Tool == EnumTool.Knife)
                     {
                         toolStacklist.Add(new ItemStack(item));
                     }
-                    else if(!HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping && item.Tool == EnumTool.Shears)
+                    else if(!HerbariumConfig.Current.useKnifeForClipping.Value && HerbariumConfig.Current.useShearsForClipping.Value && item.Tool == EnumTool.Shears)
                     {
                         toolStacklist.Add(new ItemStack(item));
                     }
 
-                    else if(HerbariumConfig.Current.useKnifeForClipping && HerbariumConfig.Current.useShearsForClipping)
+                    else if(HerbariumConfig.Current.useKnifeForClipping.Value && HerbariumConfig.Current.useShearsForClipping.Value)
                     {
                         if (item.Tool == EnumTool.Knife || item.Tool == EnumTool.Shears)
                         {
@@ -115,8 +115,8 @@ namespace herbarium
                 return false;
             }
 
-            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping) ||
-                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping))
+            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping.Value) ||
+                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping.Value))
             {
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
                 {
@@ -140,8 +140,8 @@ namespace herbarium
 
         public override bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
-            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping) ||
-                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping))
+            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping.Value) ||
+                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping.Value))
             {
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && beugbush.Pruned)
                 {                

@@ -23,8 +23,6 @@ namespace herbarium
 
         Dictionary<string, Dictionary<string, int>> durabilityGains;
 
-
-
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);

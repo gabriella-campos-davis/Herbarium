@@ -14,14 +14,34 @@ namespace herbarium
 {
     public class BlockLeavesDropCanes : BlockLeaves
     {
+
+        public Random rand = new Random();
+
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
         }
 
-        public override void OnBlockRemoved(IWorldAccessor world, BlockPos pos)
+        public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
         {
-            base.OnBlockRemoved(world, pos);
+            var drops = base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
+
+            if(Attributes["dropsCanes"].AsBool() == true)
+            {
+                ItemStack caneItem = new ItemStack(api.World.GetItem(AssetLocation.Create("willowcane-" + Variant["wood"].ToString(), Code.Domain)), 1);
+                if(rand.Next(0, 10) > 4) world.SpawnItemEntity(caneItem, pos.ToVec3d());
+                
+                //drops.Prepend(caneItem);
+            }
+
+            if(Attributes["dropsLeaves"].AsBool() == true)
+            {
+                ItemStack leafItem = new ItemStack(api.World.GetItem(AssetLocation.Create("leaves-" + Variant["wood"].ToString(), Code.Domain)), 1);
+                if(rand.Next(0, 10) > 2) world.SpawnItemEntity(leafItem, pos.ToVec3d());
+                //drops.Prepend(leafItem);
+            }
+
+            return drops;
         }
     }
 }

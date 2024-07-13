@@ -35,9 +35,10 @@ D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.GeneratedMSBuildEditorC
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.AssemblyInfoInputs.cache
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.AssemblyInfo.cs
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.csproj.CoreCompileInputs.cache
-D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.csproj.CopyComplete
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.dll
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\refint\CakeBuild.dll
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.pdb
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.genruntimeconfig.cache
 D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\ref\CakeBuild.dll
+D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.sourcelink.json
+D:\VSMods\Herbarium\CakeBuild\obj\Debug\net7.0\CakeBuild.csproj.Up2Date

@@ -1,11 +1,19 @@
+using System.Collections.Generic;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
+using Vintagestory.GameContent;
+using System.Linq;
+using System;
 using Vintagestory.API.Common.Entities;
 using herbarium.config;
+using herbarium;
+
 
 namespace herbarium
 {
-    public class PricklyBerryBush : HerbariumBerryBush
+    public class BlockPricklyLeaves : BlockLeavesDropCanes
     {
         public bool canDamage = HerbariumConfig.Current.berryBushCanDamage.Value;
         public string[] willDamage = HerbariumConfig.Current.berryBushWillDamage;

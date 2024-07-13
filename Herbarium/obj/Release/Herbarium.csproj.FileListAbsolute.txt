@@ -15,6 +15,7 @@ D:\VSMods\Herbarium\Herbarium\obj\Release\Herbarium.GeneratedMSBuildEditorConfig
 D:\VSMods\Herbarium\Herbarium\obj\Release\Herbarium.AssemblyInfoInputs.cache
 D:\VSMods\Herbarium\Herbarium\obj\Release\Herbarium.AssemblyInfo.cs
 D:\VSMods\Herbarium\Herbarium\obj\Release\Herbarium.csproj.CoreCompileInputs.cache
+D:\VSMods\Herbarium\Herbarium\obj\Release\Herbarium.sourcelink.json
 D:\VSMods\Herbarium\Herbarium\obj\Release\Herbarium.dll
 D:\VSMods\Herbarium\Herbarium\obj\Release\refint\Herbarium.dll
 D:\VSMods\Herbarium\Herbarium\obj\Release\Herbarium.pdb

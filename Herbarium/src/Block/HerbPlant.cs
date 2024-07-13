@@ -18,12 +18,12 @@ namespace herbarium
 
         public bool isPoisonous = false;
 
-        public bool canDamage = HerbariumConfig.Current.plantsCanDamage;
-        public bool canPoison = HerbariumConfig.Current.plantsCanPoison;
+        public bool canDamage = HerbariumConfig.Current.plantsCanDamage.Value;
+        public bool canPoison = HerbariumConfig.Current.plantsCanPoison.Value;
         public string[] willDamage = HerbariumConfig.Current.plantsWillDamage;
 
-        public float dmg = HerbariumConfig.Current.berryBushDamage;
-        public float dmgTick = HerbariumConfig.Current.berryBushDamageTick;
+        public float dmg = HerbariumConfig.Current.berryBushDamage.Value;
+        public float dmgTick = HerbariumConfig.Current.berryBushDamageTick.Value;
 
         public override void OnLoaded(ICoreAPI api)
         {
