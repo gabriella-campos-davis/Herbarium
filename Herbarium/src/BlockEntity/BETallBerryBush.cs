@@ -261,13 +261,13 @@ namespace herbarium
                 {
                     if(block.Attributes["isLarge"].AsBool() && Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes["isBottomBlock"].AsBool())
                     {
-                        if(Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)) is not HerbariumBerryBush)
+                        if(Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)).BlockMaterial is not EnumBlockMaterial.Plant)
                         {
                             Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
                             if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());  
                         }
                     }
-                    if (Api.World.BlockAccessor.GetBlock(Pos.DownCopy()) is not HerbariumBerryBush) 
+                    if (Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).BlockMaterial is not EnumBlockMaterial.Plant) 
                     {
                         Block growthBlock = Api.World.BlockAccessor.GetBlock(AssetLocation.Create(Block.Attributes["growthBlock"].ToString()));
                         if (growthBlock is not null) Api.World.BlockAccessor.SetBlock(growthBlock.BlockId, Pos.UpCopy());

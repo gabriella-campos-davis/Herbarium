@@ -28,7 +28,7 @@ namespace herbarium
 
             if(Attributes["dropsCanes"].AsBool() == true)
             {
-                ItemStack caneItem = new ItemStack(api.World.GetItem(AssetLocation.Create("willowcane-" + Variant["wood"].ToString(), Code.Domain)), 1);
+                ItemStack caneItem = new ItemStack(api.World.GetItem(AssetLocation.Create(this.Attributes["willowCaneItem"].ToString(), Code.Domain)), 1);
                 if(rand.Next(0, 10) > 4) world.SpawnItemEntity(caneItem, pos.ToVec3d());
                 
                 //drops.Prepend(caneItem);
@@ -36,7 +36,7 @@ namespace herbarium
 
             if(Attributes["dropsLeaves"].AsBool() == true)
             {
-                ItemStack leafItem = new ItemStack(api.World.GetItem(AssetLocation.Create("leaves-" + Variant["wood"].ToString(), Code.Domain)), 1);
+                ItemStack leafItem = new ItemStack(api.World.GetItem(AssetLocation.Create(this.Attributes["leafItem"].ToString(), Code.Domain)), 1);
                 if(rand.Next(0, 10) > 2) world.SpawnItemEntity(leafItem, pos.ToVec3d());
                 //drops.Prepend(leafItem);
             }

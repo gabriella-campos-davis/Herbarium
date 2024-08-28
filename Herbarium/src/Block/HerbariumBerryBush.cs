@@ -190,33 +190,38 @@ namespace herbarium
                     base.OnBlockInteractStop(secondsUsed, world, byPlayer, blockSel);
                     return;
                 }
-            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-            if (secondsUsed > harvestTime - 0.05f && clipping != null && world.Side == EnumAppSide.Server)
-            {
-                if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
+            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping.Value) ||
+                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping.Value))
                 {
-                    beugbush.Prune();
-                    GiveClipping(world, byPlayer, blockSel);
                     world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+                    if (secondsUsed > harvestTime - 0.05f && clipping != null && world.Side == EnumAppSide.Server)
+                    {
+                        if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
+                        {
+                            beugbush.Prune();
+                            GiveClipping(world, byPlayer, blockSel);
+                            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+                            return;
+                        }
+                        else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && !beugtbush.Pruned )
+                        {
+                            beugtbush.Prune();
+                            GiveClipping(world, byPlayer, blockSel);
+                            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+                            return;
+                        }
+                        else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && !beugsbush.Pruned )
+                        {
+                            beugsbush.Prune();
+                            GiveClipping(world, byPlayer, blockSel);
+                            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+                            return;
+                        }
+                        return;
+                    }
                     return;
                 }
-                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && !beugtbush.Pruned )
-                {
-                    beugtbush.Prune();
-                    GiveClipping(world, byPlayer, blockSel);
-                    world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                    return;
-                }
-                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && !beugsbush.Pruned )
-                {
-                    beugsbush.Prune();
-                    GiveClipping(world, byPlayer, blockSel);
-                    world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                    return;
-                }
-                return;
-            }
-            return;
+            
         }
 
         void GiveClipping(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)

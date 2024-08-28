@@ -99,7 +99,7 @@ namespace herbarium
             {
                 if(state == "alive")
                 {
-                    if(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes["isLarge"].AsBool() && Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)) is not HerbariumBerryBush
+                    if(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes["isLarge"].AsBool() && Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)).BlockMaterial is not EnumBlockMaterial.Plant
                         && block.Attributes["isGrowth"].AsBool())
                     {
                         Block newBottomBlock = Api.World.GetBlock(AssetLocation.Create(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes["bottomBlock"].ToString()));
