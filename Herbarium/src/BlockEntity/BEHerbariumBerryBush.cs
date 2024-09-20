@@ -18,6 +18,22 @@ namespace herbarium
             MarkDirty(true);
         }
 
+        public override void CheckGrow(float dt)
+        {
+            base.CheckGrow(dt);
+            
+            if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > 9)
+            {
+                Pruned = false;
+            }
+        }
+
+        public override void OnExchanged(Block block)
+        {
+            base.OnExchanged(block);
+            transitionHoursLeft = GetHoursForNextStage();
+        }
+
         public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
         {
             if (Pruned)

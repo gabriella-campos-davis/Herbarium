@@ -161,7 +161,6 @@ namespace herbarium
                 if (transitionHoursLeft <= 0)
                 {
                     if (!DoGrow()) return;
-                    transitionHoursLeft = GetHoursForNextStage();
                 }
             }
 
@@ -171,6 +170,7 @@ namespace herbarium
         public override void OnExchanged(Block block)
         {
             base.OnExchanged(block);
+            transitionHoursLeft = GetHoursForNextStage();
             if (Api?.Side == EnumAppSide.Server) UpdateTransitionsFromBlock();
         }
 
