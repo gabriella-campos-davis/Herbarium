@@ -326,6 +326,30 @@ namespace herbarium
                 Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
             }
 
+            var bbhm = Block.GetBehavior<BlockBehaviorHarvestMultiple>();
+            if (bbhm?.harvestedStacks != null)
+            {
+                for(int i = 0; i < harvestedStacks.Length; i++)
+                {
+                    ItemStack dropStack = bbhm.harvestedStacks[i].GetNextItemStack();
+                    Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
+                }
+
+                Api.World.PlaySoundAt(bbhm.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
+            }
+
+            var bbhmk = Block.GetBehavior<BlockBehaviorHarvestMultipleWithKnife>();
+            if (bbhk?.harvestedStacks != null)
+            {
+                for(int i = 0; i < harvestedStacks.Length; i++)
+                {
+                    ItemStack dropStack = bbhmk.harvestedStacks[i].GetNextItemStack();
+                    Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
+                }
+
+                Api.World.PlaySoundAt(bbhmk.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
+            }
+
 
             Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
             MarkDirty(true);
