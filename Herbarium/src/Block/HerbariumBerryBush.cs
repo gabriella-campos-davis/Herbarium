@@ -231,7 +231,7 @@ namespace herbarium
                 world.SpawnItemEntity(clipping, byPlayer.Entity.SidedPos.XYZ);
             }
                     
-            byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack.Collectible.DamageItem(world, byPlayer as Entity, byPlayer.InventoryManager.ActiveHotbarSlot, 1);
+            byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack.Collectible.DamageItem(world, byPlayer.Entity, byPlayer.InventoryManager.ActiveHotbarSlot, 1);
             world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);   
         }
 
