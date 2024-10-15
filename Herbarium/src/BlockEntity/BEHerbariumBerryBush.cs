@@ -1,14 +1,31 @@
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Common.Entities;
+using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
 namespace herbarium 
 {
-    public class BEHerbariumBerryBush : BlockEntityBerryBush
+    public class BEHerbariumBerryBush : BlockEntityBerryBush, IAnimalFoodSource
     {
         public BEHerbariumBerryBush() : base()
         {
 
+        }
+
+        public override void Initialize(ICoreAPI api)
+        {
+            base.Initialize(api);
+
+            if (api is ICoreServerAPI)
+            {
+
+                if (Api.World.Config.GetBool("processCrops", true))
+                {
+                    RegisterGameTickListener(CheckPruneRegrowth, 8000);
+                }
+
+            }
         }
 
         public void Prune()
@@ -18,23 +35,15 @@ namespace herbarium
             MarkDirty(true);
         }
 
-        public override void CheckGrow(float dt)
+        private void CheckPruneRegrowth(float dt)
         {
-            base.CheckGrow(dt);
-            
-            if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > 3 * API.World.Calendar.DaysPerMonth / growthRateMul)
+            if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > 3 * Api.World.Calendar.DaysPerMonth / (float)Api.World.Config.GetDecimal("cropGrowthRateMul", 1.0))
             {
                 Pruned = false;
             }
         }
 
-        public override void OnExchanged(Block block)
-        {
-            base.OnExchanged(block);
-            transitionHoursLeft = GetHoursForNextStage();
-        }
-
-        public override float ConsumeOnePortion(Entity entity)
+        public float ConsumeOnePortion(Entity entity)
         {
             AssetLocation loc = Block.CodeWithParts("empty");
             if (!loc.Valid)
@@ -57,7 +66,7 @@ namespace herbarium
             var bbhm = Block.GetBehavior<BlockBehaviorHarvestMultiple>();
             if (bbhm?.harvestedStacks != null)
             {
-                for(int i = 0; i < harvestedStacks.Length; i++)
+                for(int i = 0; i < bbhm.harvestedStacks.Length; i++)
                 {
                     ItemStack dropStack = bbhm.harvestedStacks[i].GetNextItemStack();
                     Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
@@ -67,9 +76,9 @@ namespace herbarium
             }
 
             var bbhmk = Block.GetBehavior<BlockBehaviorHarvestMultipleWithKnife>();
-            if (bbhk?.harvestedStacks != null)
+            if (bbhmk?.harvestedStacks != null)
             {
-                for(int i = 0; i < harvestedStacks.Length; i++)
+                for(int i = 0; i < bbhmk.harvestedStacks.Length; i++)
                 {
                     ItemStack dropStack = bbhmk.harvestedStacks[i].GetNextItemStack();
                     Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
