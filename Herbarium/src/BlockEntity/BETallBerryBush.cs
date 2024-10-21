@@ -120,7 +120,7 @@ namespace herbarium
                 roomness = 0;
             }
 
-            if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > 3 * API.World.Calendar.DaysPerMonth / growthRateMul)
+            if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > 3 * Api.World.Calendar.DaysPerMonth / growthRateMul)
             {
                 Pruned = false;
             }
@@ -378,7 +378,7 @@ namespace herbarium
             var bbhm = Block.GetBehavior<BlockBehaviorHarvestMultiple>();
             if (bbhm?.harvestedStacks != null)
             {
-                for(int i = 0; i < harvestedStacks.Length; i++)
+                for(int i = 0; i < bbhm.harvestedStacks.Length; i++)
                 {
                     ItemStack dropStack = bbhm.harvestedStacks[i].GetNextItemStack();
                     Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
@@ -388,9 +388,9 @@ namespace herbarium
             }
 
             var bbhmk = Block.GetBehavior<BlockBehaviorHarvestMultipleWithKnife>();
-            if (bbhk?.harvestedStacks != null)
+            if (bbhmk?.harvestedStacks != null)
             {
-                for(int i = 0; i < harvestedStacks.Length; i++)
+                for(int i = 0; i < bbhmk.harvestedStacks.Length; i++)
                 {
                     ItemStack dropStack = bbhmk.harvestedStacks[i].GetNextItemStack();
                     Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
