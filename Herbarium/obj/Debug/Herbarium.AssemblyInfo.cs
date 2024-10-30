@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Herbarium")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e137f66b246d4886a66f2f2d0ca4a3e549238110")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e64ca895c7e2e7af67015991a40307a741d15f81")]
 [assembly: System.Reflection.AssemblyProductAttribute("Herbarium")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Herbarium")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

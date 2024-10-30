@@ -23,10 +23,9 @@ namespace herbarium
        public override void AssetsLoaded(ICoreAPI api)
 		{
 			base.AssetsLoaded(api);
-			api.RegisterBlockClass("BlockCoconutTree", typeof(BlockCoconutTree));
 		}
 
-                #region Client
+        #region Client
         public override void StartClientSide(ICoreClientAPI capi)
         {
             networkHandler.InitializeClientSideNetworkHandler(capi);
