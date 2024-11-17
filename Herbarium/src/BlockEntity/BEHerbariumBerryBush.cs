@@ -1,33 +1,18 @@
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
-using Vintagestory.API.Server;
-using Vintagestory.GameContent;
+using Vintagestory.API.Datastructures;
 
 namespace herbarium 
 {
-    public class BEHerbariumBerryBush : BlockEntityBerryBush, IAnimalFoodSource
+    public class BEHerbariumBerryBush : BEBerryPlant
     {
+        public bool Pruned;
+        public double LastPrunedTotalDays;
+
         public BEHerbariumBerryBush() : base()
         {
 
         }
-
-        public override void Initialize(ICoreAPI api)
-        {
-            base.Initialize(api);
-
-            if (api is ICoreServerAPI)
-            {
-
-                if (Api.World.Config.GetBool("processCrops", true))
-                {
-                    RegisterGameTickListener(CheckPruneRegrowth, 8000);
-                }
-
-            }
-        }
-
         public void Prune()
         {
             Pruned = true;
@@ -35,63 +20,31 @@ namespace herbarium
             MarkDirty(true);
         }
 
-        private void CheckPruneRegrowth(float dt)
+        protected override void CheckGrow(float dt)
         {
+            base.CheckGrow(dt);
+
             if (Api.World.Calendar.TotalDays - LastPrunedTotalDays > 3 * Api.World.Calendar.DaysPerMonth / (float)Api.World.Config.GetDecimal("cropGrowthRateMul", 1.0))
             {
                 Pruned = false;
+                MarkDirty(false);
             }
         }
 
-        public float ConsumeOnePortion(Entity entity)
+        public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
         {
-            AssetLocation loc = Block.CodeWithParts("empty");
-            if (!loc.Valid)
-            {
-                Api.World.BlockAccessor.RemoveBlockEntity(Pos);
-                return 0f;
-            }
+            base.FromTreeAttributes(tree, worldForResolving);
 
-            Block nextBlock = Api.World.GetBlock(loc);
-            if (nextBlock?.Code == null) return 0f;
+            Pruned = tree.GetBool("pruned");
+            LastPrunedTotalDays = tree.GetDecimal("lastPrunedTotalDays");
+        }
 
-            var bbh = Block.GetBehavior<BlockBehaviorHarvestable>();
-            if (bbh?.harvestedStack != null)
-            {
-                ItemStack dropStack = bbh.harvestedStack.GetNextItemStack();
-                Api.World.PlaySoundAt(bbh.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
-                Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
-            }
+        public override void ToTreeAttributes(ITreeAttribute tree)
+        {
+            base.ToTreeAttributes(tree);
 
-            var bbhm = Block.GetBehavior<BlockBehaviorHarvestMultiple>();
-            if (bbhm?.harvestedStacks != null)
-            {
-                for(int i = 0; i < bbhm.harvestedStacks.Length; i++)
-                {
-                    ItemStack dropStack = bbhm.harvestedStacks[i].GetNextItemStack();
-                    Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
-                }
-
-                Api.World.PlaySoundAt(bbhm.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
-            }
-
-            var bbhmk = Block.GetBehavior<BlockBehaviorHarvestMultipleWithKnife>();
-            if (bbhmk?.harvestedStacks != null)
-            {
-                for(int i = 0; i < bbhmk.harvestedStacks.Length; i++)
-                {
-                    ItemStack dropStack = bbhmk.harvestedStacks[i].GetNextItemStack();
-                    Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
-                }
-
-                Api.World.PlaySoundAt(bbhmk.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
-            }
-
-
-            Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
-            MarkDirty(true);
-
-            return 0.1f;
+            tree.SetBool("pruned", Pruned);
+            tree.SetDouble("lastPrunedTotalDays", LastPrunedTotalDays);
         }
 
         public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
