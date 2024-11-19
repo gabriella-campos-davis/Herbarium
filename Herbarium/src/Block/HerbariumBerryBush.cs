@@ -4,12 +4,9 @@ using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 using Vintagestory.GameContent;
-using Vintagestory.API.Datastructures;
 using System.Linq;
 using System;
-using Vintagestory.API.Common.Entities;
 using herbarium.config;
-using herbarium;
 
 namespace herbarium
 {
@@ -73,7 +70,7 @@ namespace herbarium
                 };
             });
         }
-        public MeshData GetPrunedMesh(BlockPos pos)
+        public virtual MeshData GetPrunedMesh(BlockPos pos)
         {
             if (api == null) return null;
             if (prunedmeshes == null) genPrunedMeshes();
@@ -123,16 +120,6 @@ namespace herbarium
                     world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);                
                     return true;
                 }
-                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && !beugtbush.Pruned )
-                {
-                    world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                    return true;
-                }
-                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && !beugsbush.Pruned )
-                {
-                    world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                    return true;
-                }
                 return false;       
             }
             return base.OnBlockInteractStart(world, byPlayer, blockSel);
@@ -145,14 +132,6 @@ namespace herbarium
             {
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && beugbush.Pruned)
                 {                
-                    return false;
-                }
-                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && beugtbush.Pruned )
-                {
-                    return false;
-                }
-                else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && beugsbush.Pruned )
-                {
                     return false;
                 }
 
@@ -203,20 +182,6 @@ namespace herbarium
                             world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
                             return;
                         }
-                        else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush beugtbush && !beugtbush.Pruned )
-                        {
-                            beugtbush.Prune();
-                            GiveClipping(world, byPlayer, blockSel);
-                            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                            return;
-                        }
-                        else if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEShrubBerryBush beugsbush && !beugsbush.Pruned )
-                        {
-                            beugsbush.Prune();
-                            GiveClipping(world, byPlayer, blockSel);
-                            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                            return;
-                        }
                         return;
                     }
                     return;
@@ -240,30 +205,18 @@ namespace herbarium
         {
             Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
 
-            if(belowBlock is null) return false;
-            if(belowBlock.Attributes is null) return false;
-
-            if(belowBlock.Fertility > 0) return true; //we are on ground, everyone can be here
-            if(belowBlock.BlockMaterial == EnumBlockMaterial.Air) return false;
-            if(belowBlock.LiquidCode == "water") return false;
-            if(Attributes["stackable"].AsBool() is false) return false; //if we can't stack and aren't on ground, gtfo
-            if(Attributes["stackable"].AsBool() is true)
+            if(Attributes["stackable"].AsBool())
             {
                 Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
-                Block belowBelowBelowblock = blockAccessor.GetBlock(pos.DownCopy(3));
-                if(belowBelowBlock is null) return false;
-                if(belowBelowBlock.Attributes is null) return false;
-                if(belowBlock.BlockMaterial == EnumBlockMaterial.Air) return false;
-                if(belowBlock.Attributes["stackable"].AsBool() is true && belowBelowBlock.Fertility > 0)
+                Block belowBelowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(3));
+
+                if(belowBlock.Attributes?["stackable"].AsBool() ?? false)
                 {
-                    return true;
-                }
-                if(Attributes["isLarge"].AsBool() && belowBelowBelowblock.Fertility > 0)
-                {
-                    return true;
+                    if (Attributes["isLarge"].AsBool() && belowBelowBelowBlock.Fertility > 0) return true;
+                    if (belowBelowBlock.Fertility > 0) return true;
                 }
             }
-            return false;
+            return belowBlock.Fertility > 0;
         }
 
 
