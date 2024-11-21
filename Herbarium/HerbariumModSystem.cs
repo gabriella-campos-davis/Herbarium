@@ -4,6 +4,7 @@ using Vintagestory.API.Client;
 using Vintagestory.API.MathTools;
 using herbarium.config;
 using BuffStuff;
+using Vintagestory.GameContent;
 
 
 [assembly: ModInfo( "Herbarium Plant Library",
@@ -94,6 +95,18 @@ namespace herbarium
             
             networkHandler.RegisterMessages(api);
             HerbariumConfig.createConfig(api);
+        }
+
+        public override void AssetsFinalize(ICoreAPI api)
+        {
+            base.AssetsFinalize(api);
+            api.GetCookingRecipes().ForEach(recipe =>
+            {
+                if (CookingRecipe.NamingRegistry.ContainsKey("jam"))
+                {
+                    CookingRecipe.NamingRegistry["jam"] = new JamRecipeName();
+                }
+            });
         }
     }
 }

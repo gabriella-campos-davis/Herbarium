@@ -13,7 +13,7 @@ namespace herbarium
         {
 
         }
-        public void Prune()
+        public virtual void Prune()
         {
             Pruned = true;
             LastPrunedTotalDays = Api.World.Calendar.TotalDays;

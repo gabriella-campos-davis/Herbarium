@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using Vintagestory.API.Client;
@@ -57,7 +56,9 @@ namespace herbarium
                 return;
             }
 
-            if(api.World.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush)
+            BlockEntity blockEntity = api.World.BlockAccessor.GetBlockEntity(blockSel.Position);
+
+            if (blockEntity is BEHerbariumBerryBush && blockEntity is not BETallBerryBush)
             {
                 return;
             }
@@ -65,29 +66,7 @@ namespace herbarium
 
             string clippingtype = Variant["type"];
 
-            Block clipBlock = byEntity.World.GetBlock(AssetLocation.Create("clipping-" + clippingtype + "-alive", Code.Domain));
-            
-            if(api.World.BlockAccessor.GetBlockEntity(blockSel.Position) is BETallBerryBush)
-            {
-                clipBlock = byEntity.World.GetBlock(AssetLocation.Create("scion-" + clippingtype + "-alive", Code.Domain));
-                if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial == EnumBlockMaterial.Air && clipBlock is not null)
-                {
-                    IPlayer byPlayer = null;
-                    if (byEntity is EntityPlayer)
-                        byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-
-                    api.World.BlockAccessor.SetBlock(clipBlock.Id, blockSel.Position.UpCopy());
-
-                    byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
-
-                    itemslot.TakeOut(1);
-                    itemslot.MarkDirty();
-                }
-                handHandling = EnumHandHandling.PreventDefault;
-
-                return;
-            }
-
+            Block clipBlock = byEntity.World.GetBlock(AssetLocation.Create((blockEntity is BETallBerryBush ? "scion-" : "clipping-") + clippingtype + "-alive", Code.Domain));
 
             if (clipBlock != null)
             {
