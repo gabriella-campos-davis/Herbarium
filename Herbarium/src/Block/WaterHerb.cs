@@ -15,14 +15,11 @@ namespace herbarium
         {
             base.OnLoaded(api);
 
-            if (Variant["state"] == "harvested")
-                return;
+            if (Variant["state"] == "harvested") return;
 
-            if(Attributes["isPoisonous"].ToString() == "true") isPoisonous = true;
-
-            maxDepth = this.Attributes["maxDepth"].AsInt();
-            minDepth = this.Attributes["minDepth"].AsInt();
-            waterCode = this.Attributes["waterCode"].AsString();
+            maxDepth = Attributes["maxDepth"].AsInt();
+            minDepth = Attributes["minDepth"].AsInt();
+            waterCode = Attributes["waterCode"].AsString();
 
         }
 
@@ -49,7 +46,6 @@ namespace herbarium
 
             if (belowBlock.LiquidCode == waterCode)
             {
-                if(belowBlock.LiquidCode != waterCode) return false;
                 for(var currentDepth = 1; currentDepth <= maxDepth + 1; currentDepth ++)
                 {
                     belowBlock = blockAccessor.GetBlock(pos.X, pos.Y - currentDepth, pos.Z);
@@ -69,7 +65,7 @@ namespace herbarium
             }
 
             return false;
-        }   
+        }
     }
 }
  

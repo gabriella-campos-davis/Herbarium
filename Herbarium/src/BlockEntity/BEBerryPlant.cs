@@ -52,13 +52,13 @@ namespace herbarium
                     lastCheckAtTotalDays = api.World.Calendar.TotalDays;
                 }
 
-                if (Api.World.Config.GetBool("processCrops", true))
+                if (api.World.Config.GetBool("processCrops", true))
                 {
                     RegisterGameTickListener(CheckGrow, 8000);
                 }
 
                 api.ModLoader.GetModSystem<POIRegistry>().AddPOI(this);
-                roomreg = Api.ModLoader.GetModSystem<RoomRegistry>();
+                roomreg = api.ModLoader.GetModSystem<RoomRegistry>();
             }
         }
 
@@ -204,8 +204,7 @@ namespace herbarium
 
         public virtual bool IsRipe()
         {
-            Block block = Api.World.BlockAccessor.GetBlock(Pos);
-            return block.LastCodePart() == "ripe";
+            return Block.Variant["state"] == "ripe";
         }
 
         protected virtual bool DoGrow()
@@ -297,7 +296,7 @@ namespace herbarium
 
         public float ConsumeOnePortion(Entity entity)
         {
-            AssetLocation loc = Block.CodeWithParts("empty");
+            AssetLocation loc = Block.CodeWithVariant("state", "empty");
             if (!loc.Valid)
             {
                 Api.World.BlockAccessor.RemoveBlockEntity(Pos);
@@ -315,28 +314,16 @@ namespace herbarium
                 Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
             }
 
-            var bbhm = Block.GetBehavior<BlockBehaviorHarvestMultiple>();
+            var bbhm = Block.GetCollectibleBehavior<BlockBehaviorHarvestMultiple>(true);
             if (bbhm?.harvestedStacks != null)
             {
-                for(int i = 0; i < bbhm.harvestedStacks.Length; i++)
+                for (int i = 0; i < bbhm.harvestedStacks.Length; i++)
                 {
                     ItemStack dropStack = bbhm.harvestedStacks[i].GetNextItemStack();
                     Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
                 }
 
                 Api.World.PlaySoundAt(bbhm.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
-            }
-
-            var bbhmk = Block.GetBehavior<BlockBehaviorHarvestMultipleWithKnife>();
-            if (bbhmk?.harvestedStacks != null)
-            {
-                for(int i = 0; i < bbhmk.harvestedStacks.Length; i++)
-                {
-                    ItemStack dropStack = bbhmk.harvestedStacks[i].GetNextItemStack();
-                    Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
-                }
-
-                Api.World.PlaySoundAt(bbhmk.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
             }
 
 

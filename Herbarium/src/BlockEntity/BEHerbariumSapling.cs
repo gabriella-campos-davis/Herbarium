@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vintagestory.API;
+﻿using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -62,22 +57,9 @@ namespace herbarium
         {
             get
             {
-                if (stage == EnumTreeGrowthStage.Seed)
-                {
-                    NatFloat sproutDays = NatFloat.create(EnumDistribution.UNIFORM, 1.5f, 0.5f);
-                    if (Block?.Attributes != null)
-                    {
-                        return Block.Attributes["growthDays"].AsObject(sproutDays);
-                    }
-                    return sproutDays;
-                }
-
-                NatFloat matureDays = NatFloat.create(EnumDistribution.UNIFORM, 7f, 2f);
-                if (Block?.Attributes != null)
-                {
-                    return Block.Attributes["matureDays"].AsObject(matureDays);
-                }
-                return matureDays;
+                if (stage == EnumTreeGrowthStage.Seed) return Block?.Attributes?["growthDays"].AsObject<NatFloat>() ?? NatFloat.create(EnumDistribution.UNIFORM, 1.5f, 0.5f);
+                
+                return Block?.Attributes?["matureDays"].AsObject<NatFloat>() ?? NatFloat.create(EnumDistribution.UNIFORM, 7f, 2f);
             }
         }
 
@@ -87,7 +69,7 @@ namespace herbarium
         {
             stage = byItemStack?.Collectible is ItemTreeSeed ? EnumTreeGrowthStage.Seed : EnumTreeGrowthStage.Sapling;
             plantedFromSeed = stage == EnumTreeGrowthStage.Seed;
-            totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * 24 * GrowthRateMod;
+            totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * Api.World.Calendar.HoursPerDay * GrowthRateMod;
         }
 
 
@@ -104,7 +86,7 @@ namespace herbarium
             if (stage == EnumTreeGrowthStage.Seed)
             {
                 stage = EnumTreeGrowthStage.Sapling;
-                totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * 24 * GrowthRateMod;
+                totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * Api.World.Calendar.HoursPerDay * GrowthRateMod;
                 MarkDirty(true);
                 return;
             }
@@ -129,11 +111,8 @@ namespace herbarium
                 return;
             }
 
-            AssetLocation code = new AssetLocation(treeGenCode);
-            ICoreServerAPI sapi = Api as ICoreServerAPI;
-
             ITreeGenerator gen;
-            if (!sapi.World.TreeGenerators.TryGetValue(code, out gen))
+            if (!(Api as ICoreServerAPI).World.TreeGenerators.TryGetValue(new AssetLocation(treeGenCode), out gen))
             {
                 Api.Event.UnregisterGameTickListener(growListenerId);
                 return;
@@ -191,13 +170,8 @@ namespace herbarium
 
         public string GetBlockName()
         {
-            if (stage == EnumTreeGrowthStage.Seed)
-            {
-                return Lang.Get("treeseed-planted-" + Block.Variant["wood"]);
-            } else
-            {
-                return Block.OnPickBlock(Api.World, Pos).GetName();
-            }
+            if (stage == EnumTreeGrowthStage.Seed) return Lang.Get("treeseed-planted-" + Block.Variant["wood"]);
+            else return Block.OnPickBlock(Api.World, Pos).GetName();
         }
 
 
@@ -221,7 +195,6 @@ namespace herbarium
             }
             else
             {
-
                 if (daysleft <= 1)
                 {
                     dsc.AppendLine(Lang.Get("Will mature in less than a day"));

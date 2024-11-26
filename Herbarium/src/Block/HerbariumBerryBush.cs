@@ -21,12 +21,18 @@ namespace herbarium
         string[] fruitingFaces;
         float harvestTime = 0.6f;
 
+        protected bool useKnifeForClipping = HerbariumConfig.Current.useKnifeForClipping.Value;
+        protected bool useShearsForClipping = HerbariumConfig.Current.useShearsForClipping.Value;
+
         public string State => Variant["state"];
         public string Type => Variant["type"];
         
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
+
+            useKnifeForClipping = api.World.Config.GetBool("useKnifeForClipping", useKnifeForClipping);
+            useShearsForClipping = api.World.Config.GetBool("useShearsForClipping", useShearsForClipping);
 
             prunedMeshFaces = Attributes["prunedMeshFaces"].AsObject<String[]>(null);
             fruitingFaces = Attributes["fruitingFaces"].AsObject<String[]>(null);
@@ -39,24 +45,12 @@ namespace herbarium
                 List<ItemStack> toolStacklist = new List<ItemStack>();
                 foreach (Item item in api.World.Items)
                 {
-                    if (item.Code == null)
-                        continue;
+                    if (item.Code == null) continue;
 
-                    if(HerbariumConfig.Current.useKnifeForClipping.Value && !HerbariumConfig.Current.useShearsForClipping.Value && item.Tool == EnumTool.Knife)
+                    if ((useKnifeForClipping && item.Tool == EnumTool.Knife) ||
+                        (useShearsForClipping && item.Tool == EnumTool.Shears))
                     {
                         toolStacklist.Add(new ItemStack(item));
-                    }
-                    else if(!HerbariumConfig.Current.useKnifeForClipping.Value && HerbariumConfig.Current.useShearsForClipping.Value && item.Tool == EnumTool.Shears)
-                    {
-                        toolStacklist.Add(new ItemStack(item));
-                    }
-
-                    else if(HerbariumConfig.Current.useKnifeForClipping.Value && HerbariumConfig.Current.useShearsForClipping.Value)
-                    {
-                        if (item.Tool == EnumTool.Knife || item.Tool == EnumTool.Shears)
-                        {
-                            toolStacklist.Add(new ItemStack(item));
-                        } 
                     }
                 }
 
@@ -112,8 +106,9 @@ namespace herbarium
                 return false;
             }
 
-            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping.Value) ||
-                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping.Value))
+            EnumTool? tool = byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool;
+            if ((tool == EnumTool.Knife && useKnifeForClipping) ||
+                (tool == EnumTool.Shears && useShearsForClipping))
             {
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
                 {
@@ -127,8 +122,9 @@ namespace herbarium
 
         public override bool OnBlockInteractStep(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
-            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping.Value) ||
-                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping.Value))
+            EnumTool? tool = byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool;
+            if ((tool == EnumTool.Knife && useKnifeForClipping) ||
+                (tool == EnumTool.Shears && useShearsForClipping))
             {
                 if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && beugbush.Pruned)
                 {                
@@ -148,7 +144,7 @@ namespace herbarium
                 if (clipping is null){
                     api.Logger.Error("Attempted to create clipping for " + this.Variant["type"] + ", came back null.");
                     return false;
-                }      
+                }
 
                 if (world.Rand.NextDouble() < 0.25)
                 {
@@ -163,30 +159,32 @@ namespace herbarium
 
         public override void OnBlockInteractStop(float secondsUsed, IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
-            if (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool != EnumTool.Knife &&
-                byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool != EnumTool.Shears)
+            EnumTool? tool = byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool;
+            if (tool != EnumTool.Knife &&
+                tool != EnumTool.Shears)
+            {
+                base.OnBlockInteractStop(secondsUsed, world, byPlayer, blockSel);
+                return;
+            }
+
+            if ((tool == EnumTool.Knife && useKnifeForClipping) ||
+                (tool == EnumTool.Shears && useShearsForClipping))
+            {
+                world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+                if (secondsUsed > harvestTime - 0.05f && clipping != null && world.Side == EnumAppSide.Server)
                 {
-                    base.OnBlockInteractStop(secondsUsed, world, byPlayer, blockSel);
-                    return;
-                }
-            if ((byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Knife && HerbariumConfig.Current.useKnifeForClipping.Value) ||
-                (byPlayer?.InventoryManager?.ActiveHotbarSlot?.Itemstack?.Collectible?.Tool == EnumTool.Shears && HerbariumConfig.Current.useShearsForClipping.Value))
-                {
-                    world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                    if (secondsUsed > harvestTime - 0.05f && clipping != null && world.Side == EnumAppSide.Server)
+                    if (world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
                     {
-                        if(world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush beugbush && !beugbush.Pruned)
-                        {
-                            beugbush.Prune();
-                            GiveClipping(world, byPlayer, blockSel);
-                            world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                            return;
-                        }
+                        beugbush.Prune();
+                        GiveClipping(world, byPlayer, blockSel);
+                        world.PlaySoundAt(harvestedSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
                         return;
                     }
                     return;
                 }
-            
+                return;
+            }
+
         }
 
         void GiveClipping(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
@@ -207,13 +205,10 @@ namespace herbarium
 
             if(Attributes["stackable"].AsBool())
             {
-                Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
-                Block belowBelowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(3));
-
                 if(belowBlock.Attributes?["stackable"].AsBool() ?? false)
                 {
-                    if (Attributes["isLarge"].AsBool() && belowBelowBelowBlock.Fertility > 0) return true;
-                    if (belowBelowBlock.Fertility > 0) return true;
+                    if (Attributes["isLarge"].AsBool() && blockAccessor.GetBlock(pos.DownCopy(3)).Fertility > 0) return true;
+                    if (blockAccessor.GetBlock(pos.DownCopy(2)).Fertility > 0) return true;
                 }
             }
             return belowBlock.Fertility > 0;

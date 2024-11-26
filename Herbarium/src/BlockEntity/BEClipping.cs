@@ -14,22 +14,13 @@ namespace herbarium
         double totalHoursTillGrowth;
         long growListenerId;
         public float dieBelowTemp;
-        public string bushCode;
-        public string bushType;
-        Block block;
 
         
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            
-            block = api.World.BlockAccessor.GetBlock(Pos);
 
-            if(block.Attributes is null){
-                return;
-            } else {
-                bushCode = block.Attributes["bushCode"].ToString();
-            }
+            dieBelowTemp = Block.Attributes?["dieBelowTemp"].AsInt(-2) ?? -2;
 
             if (api is ICoreServerAPI)
             {
@@ -41,12 +32,7 @@ namespace herbarium
         {
             get
             {
-                NatFloat matureDays = NatFloat.create(EnumDistribution.UNIFORM, 7f, 2f);
-                if (Block?.Attributes != null)
-                {
-                    return Block.Attributes["matureDays"].AsObject(matureDays);
-                }
-                return matureDays;
+                return Block?.Attributes?["matureDays"].AsObject<NatFloat>() ?? NatFloat.create(EnumDistribution.UNIFORM, 7f, 2f);
             }
         }
 
@@ -54,82 +40,48 @@ namespace herbarium
 
         public override void OnBlockPlaced(ItemStack byItemStack)
         {
-            ICoreServerAPI sapi = Api as ICoreServerAPI;
-
-            totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * 24 * GrowthRateMod;
-            bushType = this.Block.Variant["type"].ToString();
+            totalHoursTillGrowth = GetHoursForNextStage();
         }
 
         private void CheckGrow(float dt)
         {
-            if (Api.World.Calendar.TotalHours < totalHoursTillGrowth)
-                return;
-
             ClimateCondition conds = Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.NowValues);
-            if (conds == null)
-            {
-                return;
-            }
 
-            if(conds.Temperature < dieBelowTemp)
-            {
-                DoGrow("dead");
-                return;
-            }
+            if (conds?.Temperature < dieBelowTemp) DoDie();
+            if (conds?.Temperature < 0) totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * Api.World.Calendar.HoursPerDay * GrowthRateMod;
 
-            if (conds.Temperature < 0)
-            {
-                totalHoursTillGrowth = Api.World.Calendar.TotalHours + (float)Api.World.Rand.NextDouble() * 72 * GrowthRateMod;
-                return;
-            }
-
-            if (conds.Temperature < 5)
-            {
-                return;
-            }
-            if (bushCode is null) return;
-
-            DoGrow("alive");
-            
+            if (conds?.Temperature >= 5 && Api.World.Calendar.TotalHours > totalHoursTillGrowth) DoGrow();
         }
-        private void DoGrow(string state){ //this contains the worst code ever written, please fix
-            ICoreServerAPI sapi = Api as ICoreServerAPI;
 
-            try
+        private void DoGrow()
+        {
+            if ((Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes?["isLarge"].AsBool() ?? false) &&
+                 Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)).BlockMaterial is not EnumBlockMaterial.Plant &&
+                 (Block.Attributes?["isGrowth"].AsBool() ?? false))
             {
-                if(state == "alive")
-                {
-                    if(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes["isLarge"].AsBool() && Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)).BlockMaterial is not EnumBlockMaterial.Plant
-                        && block.Attributes["isGrowth"].AsBool())
-                    {
-                        Block newBottomBlock = Api.World.GetBlock(AssetLocation.Create(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes["bottomBlock"].ToString()));
-                        
-                        if (newBottomBlock is null) return;
+                Block newBottomBlock = Api.World.GetBlock(AssetLocation.Create(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes?["bottomBlock"].ToString()));
 
-                        Api.World.BlockAccessor.SetBlock(newBottomBlock.BlockId, Pos.DownCopy());
-                    }
-                    Block newBushBlock = Api.World.GetBlock(AssetLocation.Create(bushCode));
-                    
-                    if (newBushBlock is null) return;
+                if (newBottomBlock is null) return;
 
-                    Api.World.BlockAccessor.SetBlock(newBushBlock.BlockId, Pos);
-                }
+                Api.World.BlockAccessor.SetBlock(newBottomBlock.BlockId, Pos.DownCopy());
+            }
+            Block newBushBlock = Api.World.GetBlock(AssetLocation.Create(Block.Attributes?["bushCode"].ToString()));
 
-                if(state == "dead")
-                {
-                    Block deadClippingBlock;
+            if (newBushBlock is null) return;
 
-                    bushType = this.Block.Variant["type"].ToString();
+            Api.World.BlockAccessor.SetBlock(newBushBlock.BlockId, Pos);
+        }
 
-                    deadClippingBlock = Api.World.GetBlock(AssetLocation.Create(this.Block.Code.FirstCodePart() + bushType + "-dead", block.Code.Domain));
-                    if (deadClippingBlock is null) return;
+        private void DoDie()
+        {
+            string bushType = Block.Variant["type"].ToString();
 
-                    Api.World.BlockAccessor.SetBlock(deadClippingBlock.BlockId, Pos);
-                }
-            } 
-            catch(Exception) 
+            if (bushType != null)
             {
-                ;
+                Block deadClippingBlock = Api.World.GetBlock(Block.CodeWithVariant("state", "dead"));
+                if (deadClippingBlock is null) return;
+
+                Api.World.BlockAccessor.SetBlock(deadClippingBlock.BlockId, Pos);
             }
         }
 
@@ -153,9 +105,9 @@ namespace herbarium
         {
             base.GetBlockInfo(forPlayer, dsc);
 
-            string isAlive = this.Block.Variant["state"].ToString();
-            if(isAlive == "dead"){
-                string type = this.Block.Variant["type"].ToString();
+            if(Block.Variant["state"].ToString() == "dead")
+            {
+                string type = Block.Variant["type"].ToString();
                 dsc.AppendLine(Lang.Get("Dead {0} clipping", type));
             }
             else 
