@@ -69,11 +69,11 @@ namespace herbarium
             api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestMultiple));
            
             api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
-            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEShrubBerryBush));
+            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEHerbariumBerryBush));
             api.RegisterBlockEntityClass("BETallBerryBush", typeof(BETallBerryBush));
             api.RegisterBlockEntityClass("BEClipping", typeof(BEClipping));
             api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
-            api.RegisterBlockEntityClass("BESeedling", typeof(BESeedling));
+            api.RegisterBlockEntityClass("BESeedling", typeof(BEClipping));
 
             api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BEHerbariumSapling));
 

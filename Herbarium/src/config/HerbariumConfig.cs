@@ -18,8 +18,11 @@ namespace herbarium.config
         public float? berryBushDamage = 0.5f;
         public float? berryBushDamageTick = 0.7f;
         public string[] berryBushWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
+        public float? berryGrowthRateMul = 1f;
+        public bool? berriesGrowByMonth = false;
         public bool? useKnifeForClipping = true;
         public bool? useShearsForClipping = true;
+        public bool? simplifiedBerryTooltips = false;
 
         public HerbariumConfig()
         {}
@@ -42,8 +45,11 @@ namespace herbarium.config
             defaultConfig.berryBushDamage = 0.5f;
             defaultConfig.berryBushDamageTick = 0.7f;
             defaultConfig.berryBushWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
+            defaultConfig.berryGrowthRateMul = 1f;
+            defaultConfig.berriesGrowByMonth = false;
             defaultConfig.useKnifeForClipping = true;
             defaultConfig.useShearsForClipping = true;
+            defaultConfig.simplifiedBerryTooltips = false;
 
             return defaultConfig;
         }
@@ -91,9 +97,15 @@ namespace herbarium.config
 
                 if (Current.berryBushWillDamage == null) Current.berryBushWillDamage = GetDefault().berryBushWillDamage;
 
+                if (Current.berryGrowthRateMul == null) Current.berryGrowthRateMul = GetDefault().berryGrowthRateMul;
+
+                if (Current.berriesGrowByMonth == null) Current.berriesGrowByMonth = GetDefault().berriesGrowByMonth;
+
                 if (Current.useKnifeForClipping == null) Current.useKnifeForClipping = GetDefault().useKnifeForClipping;
 
                 if (Current.useShearsForClipping == null) Current.useShearsForClipping = GetDefault().useShearsForClipping;
+
+                if (Current.simplifiedBerryTooltips == null) Current.simplifiedBerryTooltips = GetDefault().simplifiedBerryTooltips;
 
                 api.StoreModConfig(Current, "herbariumconfig.json");
             }
