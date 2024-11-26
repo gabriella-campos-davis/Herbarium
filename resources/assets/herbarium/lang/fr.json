@@ -1,3 +1,18 @@
 {
-    "blockhelp-berrybush-clip": "Couper la branche"
+    "blockhelp-berrybush-clip": "Couper la branche",
+
+    "game:berrybush-too-cold": "Trop froid pour fleurir ou fructifier",
+    "game:berrybush-too-hot": "Trop chaud pour fleurir ou fructifier",
+
+    "game:clipping-too-cold": "Trop froid pour pousser",
+    "game:clipping-too-hot": "Trop chaud pour pousser",
+
+    "game:berrybush-shed-xdays": "Baies frais pendant {0} jours",
+    "game:berrybush-shed-1day": "Baies frais pendant moins d'une journée",
+
+    "game:berrybush-sprouting-xdays": "Va produire une nouvelle pousse dans {0} jours",
+    "game:berrybush-sprouting-1day": "Va produire une nouvelle pousse dans moins d'une journée",
+
+    "game:berrybush-clipping-growth-xdays": "Va repousser les branches coupées dans {0} jours",
+    "game:berrybush-clipping-growth-1day": "Va repousser les branches coupées dans moins d'une journée"
 }
