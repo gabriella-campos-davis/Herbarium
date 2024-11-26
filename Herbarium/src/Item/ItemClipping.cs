@@ -47,8 +47,10 @@ namespace herbarium
                 return;
             }
 
+            if (Variant["state"] == "dry") return;
+
             BlockEntity blockEntity = api.World.BlockAccessor.GetBlockEntity(blockSel.Position);
-            if ((blockEntity is BEHerbariumBerryBush && blockEntity is not BETallBerryBush) || Variant["state"] == "dry") return;
+            Block selBlock = api.World.BlockAccessor.GetBlock(blockSel.Position);
 
             Block clipBlock = byEntity.World.GetBlock(AssetLocation.Create((blockEntity is BETallBerryBush ? "scion-" : "clipping-") + Variant["type"] + "-alive", Code.Domain));
             IPlayer byPlayer = (byEntity is EntityPlayer) ? byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID) : null;

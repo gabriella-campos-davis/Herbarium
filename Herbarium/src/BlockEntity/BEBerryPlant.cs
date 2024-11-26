@@ -1,8 +1,6 @@
+using herbarium.config;
 using System;
-using System.Text;
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
-using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
@@ -10,26 +8,38 @@ using Vintagestory.GameContent;
 
 namespace herbarium
 {
-    public class BEBerryPlant : BlockEntity, IAnimalFoodSource
+    public enum EnumHBBTemp
     {
-        protected static Random rand = new Random();
-        protected const float intervalHours = 2f;
+        RevertBelow = -3,
+        ResetBelow,
+        StopBelow,
+        Acceptable,
+        StopAbove,
+        ResetAbove,
+        RevertAbove
+    }
 
+    public class BEBerryPlant : BlockEntity
+    {
         protected double lastCheckAtTotalDays = 0;
         protected double transitionHoursLeft = -1;
 
         protected RoomRegistry roomreg;
         public int roomness;
-        public string[] creatureDietFoodTags;
 
-        protected float resetBelowTemperature = 0;
-        protected float resetAboveTemperature = 0;
-        protected float stopBelowTemperature = 0;
-        protected float stopAboveTemperature = 0;
-        protected float revertBlockBelowTemperature = 0;
-        protected float revertBlockAboveTemperature = 0;
+        protected float resetBelowTemp = 0;
+        protected float resetAboveTemp = 0;
+        protected float stopBelowTemp = 0;
+        protected float stopAboveTemp = 0;
+        protected float revertBelowTemp = 0;
+        protected float revertAboveTemp = 0;
+        protected EnumHBBTemp temperatureState = EnumHBBTemp.Acceptable;
 
-        protected float growthRateMul = 1f;
+        public EnumHBBTemp TemperatureState { get { return temperatureState; } }
+
+        protected float growthRateMul = HerbariumConfig.Current.berryGrowthRateMul.Value;
+        protected bool growByMonth = HerbariumConfig.Current.berriesGrowByMonth.Value;
+        protected bool simplifiedTooltips = HerbariumConfig.Current.simplifiedBerryTooltips.Value;
 
         public BEBerryPlant() : base()
         {
@@ -40,12 +50,12 @@ namespace herbarium
         {
             base.Initialize(api);
 
-            growthRateMul = (float)Api.World.Config.GetDecimal("cropGrowthRateMul", growthRateMul);
+            growthRateMul = api.World.Config.GetFloat("berryGrowthRateMul", growthRateMul);
+            growByMonth = api.World.Config.GetBool("berriesGrowByMonth", growByMonth);
+            simplifiedTooltips = api.World.Config.GetBool("simplifiedBerryTooltips", simplifiedTooltips);
 
             if (api is ICoreServerAPI)
             {
-                creatureDietFoodTags = Block.Attributes["foodTags"].AsArray<string>();
-
                 if (transitionHoursLeft <= 0)
                 {
                     transitionHoursLeft = GetHoursForNextStage();
@@ -57,35 +67,57 @@ namespace herbarium
                     RegisterGameTickListener(CheckGrow, 8000);
                 }
 
-                api.ModLoader.GetModSystem<POIRegistry>().AddPOI(this);
                 roomreg = api.ModLoader.GetModSystem<RoomRegistry>();
+
+                ClimateCondition conds = null;
+                float baseTemperature = 0;
+
+                temperatureState = CheckTemperature(TemperatureAtDate(Api.World.Calendar.TotalDays, ref conds, ref baseTemperature));
             }
+        }
+
+        protected virtual NatFloat nextStageDaysRnd
+        {
+            get
+            {
+                NatFloat days = NatFloat.create(EnumDistribution.UNIFORM, 8.8f, 0.8f);
+
+                if (IsRipe()) days = Block?.Attributes?["sheddingDays"].AsObject<NatFloat>() ?? NatFloat.create(EnumDistribution.UNIFORM, 35.2f, 3.2f);
+                else if (IsFlowering()) days = Block?.Attributes?["ripeningDays"].AsObject<NatFloat>() ?? days;
+                else days = Block?.Attributes?["floweringDays"].AsObject<NatFloat>() ?? days;
+
+                return days;
+            }
+        }
+
+        protected virtual float IntervalHours(double daysToCheck)
+        {
+            return  Math.Clamp((float)(daysToCheck / Api.World.Calendar.DaysPerMonth) * 2f, 2f, Api.World.Calendar.DaysPerMonth * Api.World.Calendar.HoursPerDay);
+        }
+
+        public virtual void OnGrowth(double lastCheck)
+        {
+            lastCheckAtTotalDays = lastCheck;
+            transitionHoursLeft = GetHoursForNextStage();
+            CheckGrow(0);
         }
 
         protected virtual void CheckGrow(float dt)
         {
             if (!(Api as ICoreServerAPI).World.IsFullyLoadedChunk(Pos)) return;
 
-            if (Block.Attributes == null)
+            if (Block.EntityClass == null)
             {
-#if DEBUG
-                Api.World.Logger.Notification("Ghost berry bush block entity at {0}. Block.Attributes is null, will remove game tick listener", Pos);
-                if (TickHandlers != null) foreach (long handlerId in TickHandlers)
-                    {
-                        Api.Event.UnregisterGameTickListener(handlerId);
-                    }
-#endif
+                Api.World.BlockAccessor.RemoveBlockEntity(Pos);
                 return;
             }
 
             // In case this block was imported from another older world. In that case lastCheckAtTotalDays would be a future date.
             lastCheckAtTotalDays = Math.Min(lastCheckAtTotalDays, Api.World.Calendar.TotalDays);
 
+            double daysToCheck = Api.World.Calendar.TotalDays - lastCheckAtTotalDays;
 
-            // We don't need to check more than one year because it just begins to loop then
-            double daysToCheck = GameMath.Mod(Api.World.Calendar.TotalDays - lastCheckAtTotalDays, Api.World.Calendar.DaysPerYear);
-
-            float intervalDays = intervalHours / Api.World.Calendar.HoursPerDay;
+            float intervalDays = IntervalHours(daysToCheck) / Api.World.Calendar.HoursPerDay;
             if (daysToCheck <= intervalDays) return;
 
             if (Api.World.BlockAccessor.GetRainMapHeightAt(Pos) > Pos.Y) // Fast pre-check
@@ -102,58 +134,16 @@ namespace herbarium
             float baseTemperature = 0;
             while (daysToCheck > intervalDays)
             {
-                daysToCheck -= intervalDays;
-                lastCheckAtTotalDays += intervalDays;
-                transitionHoursLeft -= intervalHours;
+                float intervalHours = IntervalHours(daysToCheck);
+                UpdateHoursLeft(intervalHours, ref intervalDays, ref daysToCheck);
 
-                if (conds == null)
-                {
-                    conds = Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.ForSuppliedDate_TemperatureOnly, lastCheckAtTotalDays);
-                    if (conds == null) return;
-                    baseTemperature = conds.WorldGenTemperature;
-                }
-                else
-                {
-                    conds.Temperature = baseTemperature;  // Keep resetting the field we are interested in, because it can be modified by the OnGetClimate event
-                    Api.World.BlockAccessor.GetClimateAt(Pos, conds, EnumGetClimateMode.ForSuppliedDate_TemperatureOnly, lastCheckAtTotalDays);
-                }
+                temperatureState = CheckTemperature(TemperatureAtDate(lastCheckAtTotalDays, ref conds, ref baseTemperature));
 
-                float temperature = conds.Temperature;
-                if (roomness > 0)
-                {
-                    temperature += 5;
-                }
+                if (temperatureState != EnumHBBTemp.Acceptable) if (StopGrowth(intervalHours)) return;
+                if (temperatureState == EnumHBBTemp.ResetBelow || temperatureState == EnumHBBTemp.ResetAbove) if (ResetGrowth()) return;
+                if (temperatureState == EnumHBBTemp.RevertBelow || temperatureState == EnumHBBTemp.RevertAbove) if (RevertGrowth()) return;
 
-                bool reset =
-                    temperature < resetBelowTemperature ||
-                    temperature > resetAboveTemperature;
-
-                bool stop =
-                    temperature < stopBelowTemperature ||
-                    temperature > stopAboveTemperature;
-
-                if (stop || reset)
-                {
-                    transitionHoursLeft += intervalHours;
-
-                    if (reset)
-                    {
-                        bool revert =
-                            temperature < revertBlockBelowTemperature ||
-                            temperature > revertBlockAboveTemperature;
-
-                        transitionHoursLeft = GetHoursForNextStage();
-                        if (revert && Block.Variant["state"] != "empty")
-                        {
-                            Block nextBlock = Api.World.GetBlock(Block.CodeWithVariant("state", "empty"));
-                            Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
-                        }
-
-
-                    }
-
-                    continue;
-                }
+                if (CheckGrowExtra()) continue;
 
                 if (transitionHoursLeft <= 0)
                 {
@@ -164,42 +154,95 @@ namespace herbarium
             MarkDirty(false);
         }
 
-        public override void OnExchanged(Block block)
+        protected virtual bool CheckGrowExtra()
         {
-            base.OnExchanged(block);
-            transitionHoursLeft = GetHoursForNextStage();
-            if (Api?.Side == EnumAppSide.Server) UpdateTransitionsFromBlock();
-        }
-
-        public override void CreateBehaviors(Block block, IWorldAccessor worldForResolve)
-        {
-            base.CreateBehaviors(block, worldForResolve);
-            if (worldForResolve.Side == EnumAppSide.Server) UpdateTransitionsFromBlock();
-        }
-
-        protected virtual void UpdateTransitionsFromBlock()
-        {
-            // In case we have a Block which is not a BerryBush block (why does this happen?)
-            if (Block?.Attributes == null)
-            {
-                resetBelowTemperature = stopBelowTemperature = revertBlockBelowTemperature = -999;
-                resetAboveTemperature = stopAboveTemperature = revertBlockAboveTemperature = 999;
-                return;
-            }
-            // These Attributes lookups are costly because Newtonsoft JSON lib ~~sucks~~ uses a weird approximation to a Dictionary in JToken.TryGetValue() but it can ignore case
-            resetBelowTemperature = Block.Attributes["resetBelowTemperature"].AsFloat(-999);
-            resetAboveTemperature = Block.Attributes["resetAboveTemperature"].AsFloat(999);
-            stopBelowTemperature = Block.Attributes["stopBelowTemperature"].AsFloat(-999);
-            stopAboveTemperature = Block.Attributes["stopAboveTemperature"].AsFloat(999);
-            revertBlockBelowTemperature = Block.Attributes["revertBlockBelowTemperature"].AsFloat(-999);
-            revertBlockAboveTemperature = Block.Attributes["revertBlockAboveTemperature"].AsFloat(999);
+            return false;
         }
 
         public virtual double GetHoursForNextStage()
         {
-            if (IsRipe()) return 4 * (5 + rand.NextDouble()) * 1.6 * Api.World.Calendar.HoursPerDay;
+            float hours = nextStageDaysRnd.nextFloat(1, Api.World.Rand) * Api.World.Calendar.HoursPerDay / growthRateMul;
+            if (IsRipe()) hours = nextStageDaysRnd.nextFloat(1, Api.World.Rand) * Api.World.Calendar.HoursPerDay;
 
-            return (5 + rand.NextDouble()) * 1.6 * Api.World.Calendar.HoursPerDay / growthRateMul;
+            return growByMonth ? hours / 9 * Api.World.Calendar.DaysPerMonth : hours;
+        }
+
+        public virtual float TemperatureAtDate(double date, ref ClimateCondition conds, ref float baseTemperature)
+        {
+            if (conds == null)
+            {
+                conds = Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.ForSuppliedDate_TemperatureOnly, date);
+                if (conds == null) return 0;
+                baseTemperature = conds.WorldGenTemperature;
+            }
+            else
+            {
+                conds.Temperature = baseTemperature;  // Keep resetting the field we are interested in, because it can be modified by the OnGetClimate event
+                Api.World.BlockAccessor.GetClimateAt(Pos, conds, EnumGetClimateMode.ForSuppliedDate_TemperatureOnly, date);
+            }
+
+            float temperature = conds.Temperature;
+
+            if (roomness > 0)
+            {
+                temperature += 5;
+            }
+
+            return temperature;
+        }
+
+        public virtual EnumHBBTemp CheckTemperature(float temp)
+        {
+            if (temp < revertBelowTemp) return EnumHBBTemp.RevertBelow;
+            if (temp < resetBelowTemp) return EnumHBBTemp.ResetBelow;
+            if (temp < stopBelowTemp) return EnumHBBTemp.StopBelow;
+            if (temp > stopAboveTemp) return EnumHBBTemp.StopAbove;
+            if (temp > resetAboveTemp) return EnumHBBTemp.ResetAbove;
+            if (temp > revertAboveTemp) return EnumHBBTemp.RevertAbove;
+            return EnumHBBTemp.Acceptable;
+        }
+
+        public virtual void UpdateHoursLeft(float intervalHours, ref float intervalDays, ref double daysToCheck)
+        {
+            intervalDays = intervalHours / Api.World.Calendar.HoursPerDay;
+            daysToCheck -= intervalDays;
+            lastCheckAtTotalDays += intervalDays;
+            transitionHoursLeft -= intervalHours;
+        }
+
+        public virtual bool StopGrowth(float intervalHours)
+        {
+            if (!IsRipe()) transitionHoursLeft += intervalHours;
+
+            return false;
+        }
+
+        public virtual bool ResetGrowth()
+        {
+            if (!IsRipe()) transitionHoursLeft = GetHoursForNextStage();
+
+            return false;
+        }
+
+        public virtual bool RevertGrowth()
+        {
+            if (Block.Variant["state"] != "empty")
+            {
+                Block nextBlock = Api.World.GetBlock(Block.CodeWithVariant("state", "empty"));
+                Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
+            }
+
+            return false;
+        }
+
+        public virtual bool IsEmpty()
+        {
+            return Block.Variant["state"] == "empty";
+        }
+
+        public virtual bool IsFlowering()
+        {
+            return Block.Variant["state"] == "flowering";
         }
 
         public virtual bool IsRipe()
@@ -209,12 +252,10 @@ namespace herbarium
 
         protected virtual bool DoGrow()
         {
-            Block block = Api.World.BlockAccessor.GetBlock(Pos);
-            string nowCodePart = block.LastCodePart();
-            string nextCodePart = (nowCodePart == "empty") ? "flowering" : ((nowCodePart == "flowering") ? "ripe" : "empty");
+            string nextCodePart = IsEmpty() ? "flowering" : (IsFlowering() ? "ripe" : "empty");
 
 
-            AssetLocation loc = block.CodeWithParts(nextCodePart);
+            AssetLocation loc = Block.CodeWithVariant("state", nextCodePart);
             if (!loc.Valid)
             {
                 Api.World.BlockAccessor.RemoveBlockEntity(Pos);
@@ -241,6 +282,7 @@ namespace herbarium
             lastCheckAtTotalDays = tree.GetDouble("lastCheckAtTotalDays");
 
             roomness = tree.GetInt("roomness");
+            temperatureState = (EnumHBBTemp)tree.GetInt("temperatureState");
         }
 
         public override void ToTreeAttributes(ITreeAttribute tree)
@@ -249,113 +291,9 @@ namespace herbarium
 
             tree.SetDouble("transitionHoursLeft", transitionHoursLeft);
             tree.SetDouble("lastCheckAtTotalDays", lastCheckAtTotalDays);
+
             tree.SetInt("roomness", roomness);
-        }
-
-        public override void GetBlockInfo(IPlayer forPlayer, StringBuilder sb)
-        {
-            Block block = Api.World.BlockAccessor.GetBlock(Pos);
-            double daysleft = transitionHoursLeft / Api.World.Calendar.HoursPerDay;
-
-            /*if (forPlayer.WorldData.CurrentGameMode == EnumGameMode.Creative)
-            {
-                return "" + daysleft;
-            }*/
-
-            if (block.LastCodePart() == "ripe")
-            {
-                return;
-            }
-
-            string code = (block.LastCodePart() == "empty") ? "flowering" : "ripen";
-
-            if (daysleft < 1)
-            {
-                sb.AppendLine(Lang.Get("berrybush-" + code + "-1day"));
-            }
-            else
-            {
-                sb.AppendLine(Lang.Get("berrybush-" + code + "-xdays", (int)daysleft));
-            }
-
-            if (roomness > 0)
-            {
-                sb.AppendLine(Lang.Get("greenhousetempbonus"));
-            }
-        }
-
-
-
-        #region IAnimalFoodSource impl
-        public bool IsSuitableFor(Entity entity, CreatureDiet diet)
-        {
-            if (diet == null) return false;
-            if (!IsRipe()) return false;
-            return diet.Matches(EnumFoodCategory.NoNutrition, this.creatureDietFoodTags);
-        }
-
-        public float ConsumeOnePortion(Entity entity)
-        {
-            AssetLocation loc = Block.CodeWithVariant("state", "empty");
-            if (!loc.Valid)
-            {
-                Api.World.BlockAccessor.RemoveBlockEntity(Pos);
-                return 0f;
-            }
-
-            Block nextBlock = Api.World.GetBlock(loc);
-            if (nextBlock?.Code == null) return 0f;
-
-            var bbh = Block.GetBehavior<BlockBehaviorHarvestable>();
-            if (bbh?.harvestedStack != null)
-            {
-                ItemStack dropStack = bbh.harvestedStack.GetNextItemStack();
-                Api.World.PlaySoundAt(bbh.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
-                Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
-            }
-
-            var bbhm = Block.GetCollectibleBehavior<BlockBehaviorHarvestMultiple>(true);
-            if (bbhm?.harvestedStacks != null)
-            {
-                for (int i = 0; i < bbhm.harvestedStacks.Length; i++)
-                {
-                    ItemStack dropStack = bbhm.harvestedStacks[i].GetNextItemStack();
-                    Api.World.SpawnItemEntity(dropStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
-                }
-
-                Api.World.PlaySoundAt(bbhm.harvestingSound, Pos.X + 0.5, Pos.Y + 0.5, Pos.Z + 0.5);
-            }
-
-
-            Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
-            MarkDirty(true);
-
-            return 0.1f;
-        }
-
-        public Vec3d Position => base.Pos.ToVec3d().Add(0.5, 0.5, 0.5);
-        public string Type => "food";
-        #endregion
-
-
-        public override void OnBlockRemoved()
-        {
-            base.OnBlockRemoved();
-
-            if (Api.Side == EnumAppSide.Server)
-            {
-                Api.ModLoader.GetModSystem<POIRegistry>().RemovePOI(this);
-            }
-        }
-
-        public override void OnBlockUnloaded()
-        {
-            base.OnBlockUnloaded();
-
-            if (Api?.Side == EnumAppSide.Server)
-            {
-                Api.ModLoader.GetModSystem<POIRegistry>().RemovePOI(this);
-            }
+            tree.SetInt("temperatureState", (int)temperatureState);
         }
     }
 }

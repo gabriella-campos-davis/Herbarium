@@ -14,7 +14,7 @@ namespace herbarium
 
             foreach (var drop in drops)
             {
-                if (drop.Collectible is HerbariumBerryBush || drop.Collectible is PricklyBerryBush) continue;
+                if (drop.Collectible.NutritionProps == null) continue;
 
                 float dropRate = 1;
 

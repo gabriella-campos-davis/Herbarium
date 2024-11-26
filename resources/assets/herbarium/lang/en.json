@@ -1,3 +1,22 @@
 {
-    "blockhelp-berrybush-clip": "Clip branch"
+    "blockhelp-berrybush-clip": "Clip branch",
+
+    "game:berrybush-too-cold": "Too cold for berries to grow",
+    "game:berrybush-too-hot": "Too hot for berries to grow",
+
+    "game:clipping-too-cold": "Too cold to grow",
+    "game:clipping-too-hot": "Too hot to grow",
+
+    "game:berrybush-shed-xdays": "Fresh berries for about {0} days",
+    "game:berrybush-shed-1day": "Fresh berries for less than a day",
+
+    "game:berrybush-sprouting-xdays": "Sprouts growth in about {0} days",
+    "game:berrybush-sprouting-1day": "Sprouts growth in less than a day",
+
+    "game:berrybush-clipping-growth-xdays": "Grows branches in about {0} days",
+    "game:berrybush-clipping-growth-1day": "Grows branches in less than a day"
+
+    "game:placefailure-berrybushclipping": "A berry bush clipping must be placed on soil or grafted on top of a berry bush",
+    "game:placefailure-berrybushclipping-nottallbush": "Cannot graft bush clippings onto this bush",
+    "game:placefailure-berrybushclipping-tootall": "Bush is too tall to graft a clipping onto"
 }

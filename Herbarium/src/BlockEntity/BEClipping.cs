@@ -1,34 +1,41 @@
-using System;
 using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
-using Vintagestory.API.Util;
 
 namespace herbarium
 {
-    public class BEClipping : BlockEntity
+    public class BEClipping : BEBerryPlant
     {
-        double totalHoursTillGrowth;
-        long growListenerId;
-        public float dieBelowTemp;
+        double totalHoursTillGrowth = -1;
 
-        
         public override void Initialize(ICoreAPI api)
         {
-            base.Initialize(api);
-
-            dieBelowTemp = Block.Attributes?["dieBelowTemp"].AsInt(-2) ?? -2;
-
             if (api is ICoreServerAPI)
             {
-                growListenerId = RegisterGameTickListener(CheckGrow, 2000);
+                if (totalHoursTillGrowth != -1)
+                {
+                    transitionHoursLeft = totalHoursTillGrowth - api.World.Calendar.TotalDays;
+                    lastCheckAtTotalDays = api.World.Calendar.TotalDays;
+                }
+
+                if (Block?.Attributes != null)
+                {
+                    resetBelowTemp = Block.Attributes["resetBelowTemp"].AsFloat(0);
+                    resetAboveTemp = Block.Attributes["resetAboveTemp"].AsFloat(999);
+                    stopBelowTemp = Block.Attributes["stopBelowTemp"].AsFloat(5);
+                    stopAboveTemp = Block.Attributes["stopAboveTemp"].AsFloat(999);
+                    revertBelowTemp = Block.Attributes["dieBelowTemp"].AsFloat(-2);
+                    revertAboveTemp = Block.Attributes["dieAboveTemp"].AsFloat(999);
+                }
             }
+
+            base.Initialize(api);
         }
 
-        NatFloat nextStageDaysRnd
+        protected override NatFloat nextStageDaysRnd
         {
             get
             {
@@ -36,84 +43,65 @@ namespace herbarium
             }
         }
 
-        float GrowthRateMod => Api.World.Config.GetString("saplingGrowthRate").ToFloat(1);
-
-        public override void OnBlockPlaced(ItemStack byItemStack)
+        protected override float IntervalHours(double daysToCheck)
         {
-            totalHoursTillGrowth = GetHoursForNextStage();
+            return 2f;
         }
 
-        private void CheckGrow(float dt)
-        {
-            ClimateCondition conds = Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.NowValues);
-
-            if (conds?.Temperature < dieBelowTemp) DoDie();
-            if (conds?.Temperature < 0) totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * Api.World.Calendar.HoursPerDay * GrowthRateMod;
-
-            if (conds?.Temperature >= 5 && Api.World.Calendar.TotalHours > totalHoursTillGrowth) DoGrow();
-        }
-
-        private void DoGrow()
+        protected override bool DoGrow()
         {
             if ((Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes?["isLarge"].AsBool() ?? false) &&
-                 Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)).BlockMaterial is not EnumBlockMaterial.Plant &&
-                 (Block.Attributes?["isGrowth"].AsBool() ?? false))
+                (!Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)).Attributes?["isBottomBlock"].AsBool() ?? false) &&
+                (Block.Attributes?["isGrowth"].AsBool() ?? false))
             {
                 Block newBottomBlock = Api.World.GetBlock(AssetLocation.Create(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes?["bottomBlock"].ToString()));
 
-                if (newBottomBlock is null) return;
+                if (newBottomBlock is null) return true;
 
-                Api.World.BlockAccessor.SetBlock(newBottomBlock.BlockId, Pos.DownCopy());
+                Api.World.BlockAccessor.ExchangeBlock(newBottomBlock.BlockId, Pos.DownCopy());
             }
-            Block newBushBlock = Api.World.GetBlock(AssetLocation.Create(Block.Attributes?["bushCode"].ToString()));
+            string blockCode = Block.Attributes?["bushCode"].ToString();
+            if (blockCode == null) blockCode = Block.Attributes?["plantCode"].ToString();
+            Block newBushBlock = Api.World.GetBlock(AssetLocation.Create(blockCode));
 
-            if (newBushBlock is null) return;
+            if (newBushBlock is null) return true;
 
             Api.World.BlockAccessor.SetBlock(newBushBlock.BlockId, Pos);
+
+            (Api.World.BlockAccessor.GetBlockEntity(Pos) as BEBerryPlant)?.OnGrowth(lastCheckAtTotalDays);
+
+            return false;
         }
 
-        private void DoDie()
+        public override bool RevertGrowth()
         {
             string bushType = Block.Variant["type"].ToString();
 
             if (bushType != null)
             {
                 Block deadClippingBlock = Api.World.GetBlock(Block.CodeWithVariant("state", "dead"));
-                if (deadClippingBlock is null) return;
+                if (deadClippingBlock is null) return false;
 
                 Api.World.BlockAccessor.SetBlock(deadClippingBlock.BlockId, Pos);
             }
-        }
 
-        public override void ToTreeAttributes(ITreeAttribute tree)
-        {
-            base.ToTreeAttributes(tree);
-
-            tree.SetDouble("totalHoursTillGrowth", totalHoursTillGrowth);
-            tree.SetFloat("dieBelowTemp", dieBelowTemp);
+            return true;
         }
 
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
         {
             base.FromTreeAttributes(tree, worldForResolving);
 
-            totalHoursTillGrowth = tree.GetDouble("totalHoursTillGrowth", 0);
-            dieBelowTemp = tree.GetFloat("dieBelowTemp", -2);
+            totalHoursTillGrowth = tree.GetDouble("totalHoursTillGrowth", -1);
         }
 
         public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
         {
             base.GetBlockInfo(forPlayer, dsc);
 
-            if(Block.Variant["state"].ToString() == "dead")
+            if ((!simplifiedTooltips && temperatureState == EnumHBBTemp.Acceptable) || simplifiedTooltips)
             {
-                string type = Block.Variant["type"].ToString();
-                dsc.AppendLine(Lang.Get("Dead {0} clipping", type));
-            }
-            else 
-            {
-                double hoursleft = totalHoursTillGrowth - Api.World.Calendar.TotalHours;
-                double daysleft = hoursleft / Api.World.Calendar.HoursPerDay;
+                double daysleft = transitionHoursLeft / Api.World.Calendar.HoursPerDay;
 
                 if (daysleft <= 1)
                 {
@@ -123,7 +111,25 @@ namespace herbarium
                 {
                     dsc.AppendLine(Lang.Get("Will grow in about {0} days", (int)daysleft));
                 }
-            } 
+            }
+
+            if (!simplifiedTooltips)
+            {
+                if (temperatureState < EnumHBBTemp.Acceptable)
+                {
+                    dsc.AppendLine(Lang.Get("clipping-too-cold"));
+                }
+
+                if (temperatureState > EnumHBBTemp.Acceptable)
+                {
+                    dsc.AppendLine(Lang.Get("clipping-too-hot"));
+                }
+            }
+
+            if (roomness > 0)
+            {
+                dsc.AppendLine(Lang.Get("greenhousetempbonus"));
+            }
         }
     }
 }

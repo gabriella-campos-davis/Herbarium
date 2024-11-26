@@ -3,7 +3,6 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
-using Vintagestory.GameContent;
 using System.Linq;
 using System;
 using herbarium.config;
@@ -195,7 +194,7 @@ namespace herbarium
         {
             Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
 
-            if(Attributes["stackable"].AsBool())
+            if(Attributes["stackable"].AsBool() && !Attributes["isBottomBlock"].AsBool())
             {
                 if(belowBlock.Attributes?["stackable"].AsBool() ?? false)
                 {

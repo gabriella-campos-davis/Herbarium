@@ -41,8 +41,11 @@ namespace herbarium.config
             HerbariumConfig.Current.berryBushDamage = herbariumConfig.berryBushDamage;
             HerbariumConfig.Current.berryBushDamageTick = herbariumConfig.berryBushDamageTick;
             HerbariumConfig.Current.berryBushWillDamage = herbariumConfig.berryBushWillDamage;
+            HerbariumConfig.Current.berryGrowthRateMul = herbariumConfig.berryGrowthRateMul;
+            HerbariumConfig.Current.berriesGrowByMonth = herbariumConfig.berriesGrowByMonth;
             HerbariumConfig.Current.useKnifeForClipping = herbariumConfig.useKnifeForClipping;
             HerbariumConfig.Current.useShearsForClipping = herbariumConfig.useShearsForClipping;
+            HerbariumConfig.Current.simplifiedBerryTooltips = herbariumConfig.simplifiedBerryTooltips;
         }
 
         #endregion
@@ -91,8 +94,11 @@ namespace herbarium.config
             public float? berryBushDamage = HerbariumConfig.Current.berryBushDamage;
             public float? berryBushDamageTick = HerbariumConfig.Current.berryBushDamageTick;
             public string[] berryBushWillDamage = HerbariumConfig.Current.berryBushWillDamage;
+            public float? berryGrowthRateMul = HerbariumConfig.Current.berryGrowthRateMul;
+            public bool? berriesGrowByMonth = HerbariumConfig.Current.berriesGrowByMonth;
             public bool? useKnifeForClipping = HerbariumConfig.Current.useKnifeForClipping;
             public bool? useShearsForClipping = HerbariumConfig.Current.useShearsForClipping;
+            public bool? simplifiedBerryTooltips = HerbariumConfig.Current.simplifiedBerryTooltips;
         }
 
         [ProtoContract]
