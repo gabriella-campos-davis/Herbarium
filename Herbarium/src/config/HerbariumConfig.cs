@@ -1,4 +1,3 @@
-using  System;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 
@@ -6,16 +5,20 @@ namespace herbarium.config
 {
     class HerbariumConfig 
     {
-        public Nullable<bool> plantsCanDamage = true;
-        public Nullable<bool> plantsCanPoison = true;
+        public bool? plantsCanDamage = true;
+        public bool? plantsCanPoison = true;
+        public float? plantsDamage = 0.5f;
+        public float? plantsDamageTick = 0.7f;
         public string[] plantsWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
-        public Nullable<bool> poulticeHealOverTime = true;
-        public Nullable<bool> berryBushCanDamage = true;
-        public Nullable<float> berryBushDamage = 0.5f;
-        public Nullable<float> berryBushDamageTick = 0.7f;
+
+        public bool? poulticeHealOverTime = true;
+
+        public bool? berryBushCanDamage = true;
+        public float? berryBushDamage = 0.5f;
+        public float? berryBushDamageTick = 0.7f;
         public string[] berryBushWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
-        public Nullable<bool> useKnifeForClipping = true;
-        public Nullable<bool> useShearsForClipping = true;
+        public bool? useKnifeForClipping = true;
+        public bool? useShearsForClipping = true;
 
         public HerbariumConfig()
         {}
@@ -28,6 +31,8 @@ namespace herbarium.config
 
             defaultConfig.plantsCanDamage = true;
             defaultConfig.plantsCanPoison = true;
+            defaultConfig.plantsDamage = 0.5f;
+            defaultConfig.plantsDamageTick = 0.7f;
             defaultConfig.plantsWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
 
             defaultConfig.poulticeHealOverTime = true;
@@ -38,7 +43,6 @@ namespace herbarium.config
             defaultConfig.berryBushWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
             defaultConfig.useKnifeForClipping = true;
             defaultConfig.useShearsForClipping = true;
-            
 
             return defaultConfig;
         }
@@ -51,52 +55,46 @@ namespace herbarium.config
                 if (Config != null)
                 {
                     api.Logger.Notification(Lang.Get("modconfigload"));
-                    HerbariumConfig.Current = Config;
+                    Current = Config;
                 }
                 else
                 {
                     api.Logger.Notification(Lang.Get("nomodconfig"));
-                    HerbariumConfig.Current = HerbariumConfig.GetDefault();
+                    Current = GetDefault();
                 }
             }
             catch
             {
-                HerbariumConfig.Current = HerbariumConfig.GetDefault();
+                Current = GetDefault();
                 api.Logger.Error(Lang.Get("defaultloaded"));
             }
             finally
             {
-                if (HerbariumConfig.Current.plantsCanDamage == null)
-                    HerbariumConfig.Current.plantsCanDamage = HerbariumConfig.GetDefault().plantsCanDamage;
+                if (Current.plantsCanDamage == null) Current.plantsCanDamage = GetDefault().plantsCanDamage;
 
-                if (HerbariumConfig.Current.plantsCanPoison == null)
-                    HerbariumConfig.Current.plantsCanPoison = HerbariumConfig.GetDefault().plantsCanPoison;
+                if (Current.plantsCanPoison == null) Current.plantsCanPoison = GetDefault().plantsCanPoison;
 
-                if (HerbariumConfig.Current.plantsWillDamage == null)
-                    HerbariumConfig.Current.plantsWillDamage = HerbariumConfig.GetDefault().plantsWillDamage;
+                if (Current.plantsDamage == null) Current.plantsDamage = GetDefault().plantsDamage;
 
-                if (HerbariumConfig.Current.poulticeHealOverTime == null)
-                    HerbariumConfig.Current.poulticeHealOverTime = HerbariumConfig.GetDefault().poulticeHealOverTime;
+                if (Current.plantsDamageTick == null) Current.plantsDamageTick = GetDefault().plantsDamageTick;
 
-                if (HerbariumConfig.Current.berryBushCanDamage == null)
-                    HerbariumConfig.Current.berryBushCanDamage = HerbariumConfig.GetDefault().berryBushCanDamage;
+                if (Current.plantsWillDamage == null) Current.plantsWillDamage = GetDefault().plantsWillDamage;
 
-                if (HerbariumConfig.Current.berryBushDamage == null)
-                    HerbariumConfig.Current.berryBushDamage = HerbariumConfig.GetDefault().berryBushDamage;
+                if (Current.poulticeHealOverTime == null) Current.poulticeHealOverTime = GetDefault().poulticeHealOverTime;
 
-                if (HerbariumConfig.Current.berryBushDamageTick == null)
-                    HerbariumConfig.Current.berryBushDamageTick = HerbariumConfig.GetDefault().berryBushDamageTick;
+                if (Current.berryBushCanDamage == null) Current.berryBushCanDamage = GetDefault().berryBushCanDamage;
 
-                if (HerbariumConfig.Current.berryBushWillDamage == null)
-                    HerbariumConfig.Current.berryBushWillDamage = HerbariumConfig.GetDefault().berryBushWillDamage;
+                if (Current.berryBushDamage == null) Current.berryBushDamage = GetDefault().berryBushDamage;
 
-                if (HerbariumConfig.Current.useKnifeForClipping == null)
-                    HerbariumConfig.Current.useKnifeForClipping = HerbariumConfig.GetDefault().useKnifeForClipping;
+                if (Current.berryBushDamageTick == null) Current.berryBushDamageTick = GetDefault().berryBushDamageTick;
 
-                if (HerbariumConfig.Current.useShearsForClipping == null)
-                    HerbariumConfig.Current.useShearsForClipping = HerbariumConfig.GetDefault().useShearsForClipping;
+                if (Current.berryBushWillDamage == null) Current.berryBushWillDamage = GetDefault().berryBushWillDamage;
 
-                api.StoreModConfig(HerbariumConfig.Current, "herbariumconfig.json");
+                if (Current.useKnifeForClipping == null) Current.useKnifeForClipping = GetDefault().useKnifeForClipping;
+
+                if (Current.useShearsForClipping == null) Current.useShearsForClipping = GetDefault().useShearsForClipping;
+
+                api.StoreModConfig(Current, "herbariumconfig.json");
             }
         }
     }

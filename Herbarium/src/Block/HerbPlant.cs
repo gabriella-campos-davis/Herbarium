@@ -16,23 +16,23 @@ namespace herbarium
         public static readonly string normalCodePart = "normal";
         public static readonly string harvestedCodePart = "harvested";
 
-        public bool isPoisonous = false;
-
         public bool canDamage = HerbariumConfig.Current.plantsCanDamage.Value;
         public bool canPoison = HerbariumConfig.Current.plantsCanPoison.Value;
         public string[] willDamage = HerbariumConfig.Current.plantsWillDamage;
 
-        public float dmg = HerbariumConfig.Current.berryBushDamage.Value;
-        public float dmgTick = HerbariumConfig.Current.berryBushDamageTick.Value;
+        public float dmg = HerbariumConfig.Current.plantsDamage.Value;
+        public float dmgTick = HerbariumConfig.Current.plantsDamageTick.Value;
 
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
 
-            if (Variant["state"] == "harvested")
-                return;
+            canDamage = api.World.Config.GetBool("plantsCanDamage", canDamage);
+            canPoison = api.World.Config.GetBool("plantsCanPoison", canPoison);
+            dmg = api.World.Config.GetFloat("plantsDamage", dmg);
+            dmgTick = api.World.Config.GetFloat("plantsDamageTick", dmgTick);
 
-            if(Attributes["isPoisonous"].ToString() == "true") isPoisonous = true;
+            if (Variant["state"] == "harvested") return;
 
             interactions = ObjectCacheUtil.GetOrCreate(api, "mushromBlockInteractions", () =>
             {
@@ -60,23 +60,15 @@ namespace herbarium
             });
         }
 
-        public override bool TryPlaceBlock(IWorldAccessor world, IPlayer byPlayer, ItemStack itemstack, BlockSelection blockSel, ref string failureCode)
-        {
-            return base.TryPlaceBlock(world, byPlayer, itemstack, blockSel, ref failureCode);
-        }
-
         public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1f)
         {
             base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
 
-            if (byPlayer != null)
+            EnumTool? tool = byPlayer?.InventoryManager.ActiveTool;
+            if (IsGrown() && (tool == EnumTool.Knife || tool == EnumTool.Sickle || tool == EnumTool.Scythe))
             {
-                EnumTool? tool = byPlayer.InventoryManager.ActiveTool;
-                if (IsGrown() && (tool == EnumTool.Knife || tool == EnumTool.Sickle || tool == EnumTool.Scythe))
-                {
-                    Block harvestedBlock = GetHarvestedBlock(world);
-                    world.BlockAccessor.SetBlock(harvestedBlock.BlockId, pos);
-                }
+                Block harvestedBlock = GetHarvestedBlock(world);
+                world.BlockAccessor.SetBlock(harvestedBlock.BlockId, pos);
             }
         }
 
@@ -125,55 +117,40 @@ namespace herbarium
 
         public override void OnEntityInside(IWorldAccessor world, Entity entity, BlockPos pos)
         {
-            if(!canDamage || !isPoisonous)
+            if (world.Side == EnumAppSide.Server && entity is EntityAgent && canDamage && Attributes["isPoisonous"].AsBool() && willDamage != null)
             {
-                return;
-            }
-
-            if(entity == null)
-            {
-                return;
-            }
-
-            if(willDamage == null)
-            {
-                return;
-            }
-
-            foreach(string creature in willDamage) 
-            {
-                if(entity.Code.ToString().Contains(creature))
+                foreach (string creature in willDamage)
                 {
-                    goto damagecreature;
-                }
-            }
-            return;
-            damagecreature:
-
-            if (world.Side == EnumAppSide.Server && entity is EntityAgent && !(entity as EntityAgent).ServerControls.Sneak) //if the creature ins't sneaking, deal damage.
-            {
-                if (world.Rand.NextDouble() > dmgTick)
-                {
-                    if(canPoison)
+                    if (entity.Code.ToString().Contains(creature))
                     {
-                        var rashDebuff = new RashDebuff();
-                        rashDebuff.Apply(entity);
-                    }
+                        EntityAgent agent = (EntityAgent)entity;
+                        if (!agent.ServerControls.Sneak)   //if the creature ins't sneaking, deal damage.
+                        {
+                            if (world.Rand.NextDouble() > dmgTick)
+                            {
+                                if (canPoison)
+                                {
+                                    var rashDebuff = new RashDebuff();
+                                    rashDebuff.Apply(entity);
+                                }
 
-                    if(!canPoison && canDamage)
-                    {
-                        entity.ReceiveDamage(new DamageSource() 
-                        { 
-                            Source = EnumDamageSource.Block, 
-                            SourceBlock = this, 
-                            Type = EnumDamageType.PiercingAttack, 
-                            SourcePos = pos.ToVec3d() 
+                                if (!canPoison && canDamage)
+                                {
+                                    entity.ReceiveDamage(new DamageSource()
+                                    {
+                                        Source = EnumDamageSource.Block,
+                                        SourceBlock = this,
+                                        Type = EnumDamageType.PiercingAttack,
+                                        SourcePos = pos.ToVec3d()
+                                    }
+                                    , dmg); //Deal damage
+                                }
+                            }
                         }
-                        , dmg); //Deal damage
+                        base.OnEntityInside(world, entity, pos);
                     }
                 }
             }
-            base.OnEntityInside(world, entity, pos);
         }
 
         public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)

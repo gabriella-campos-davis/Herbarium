@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -12,9 +11,7 @@ namespace herbarium
         WorldInteraction[] interactions;
         public override void OnLoaded(ICoreAPI api)
         {
-            if (api.Side != EnumAppSide.Client)
-                return;
-            ICoreClientAPI capi = api as ICoreClientAPI;
+            if (api.Side != EnumAppSide.Client) return;
 
             interactions = ObjectCacheUtil.GetOrCreate(api, "clippingInteractions", () =>
             {
@@ -44,12 +41,6 @@ namespace herbarium
         }
         public override void OnHeldInteractStart(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling)
         {
-            string alive = Variant["state"];
-            if (alive == "dry")
-            {
-                return;
-            }
-
             if (blockSel == null || !byEntity.Controls.Sneak)
             {
                 base.OnHeldInteractStart(itemslot, byEntity, blockSel, entitySel, firstEvent, ref handHandling);
@@ -57,70 +48,42 @@ namespace herbarium
             }
 
             BlockEntity blockEntity = api.World.BlockAccessor.GetBlockEntity(blockSel.Position);
+            if ((blockEntity is BEHerbariumBerryBush && blockEntity is not BETallBerryBush) || Variant["state"] == "dry") return;
 
-            if (blockEntity is BEHerbariumBerryBush && blockEntity is not BETallBerryBush)
+            Block clipBlock = byEntity.World.GetBlock(AssetLocation.Create((blockEntity is BETallBerryBush ? "scion-" : "clipping-") + Variant["type"] + "-alive", Code.Domain));
+            IPlayer byPlayer = (byEntity is EntityPlayer) ? byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID) : null;
+
+            blockSel = blockSel.Clone();
+            blockSel.Position.Up();
+
+            string failureCode = "";
+            if (!clipBlock?.TryPlaceBlock(api.World, byPlayer, itemslot.Itemstack, blockSel, ref failureCode) ?? true)
             {
-                return;
-            }
-
-
-            string clippingtype = Variant["type"];
-
-            Block clipBlock = byEntity.World.GetBlock(AssetLocation.Create((blockEntity is BETallBerryBush ? "scion-" : "clipping-") + clippingtype + "-alive", Code.Domain));
-
-            if (clipBlock != null)
-            {
-                IPlayer byPlayer = null;
-                if (byEntity is EntityPlayer)
-                    byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-
-                blockSel = blockSel.Clone();
-                blockSel.Position.Up();
-
-                string failureCode = "";
-                if (!clipBlock.TryPlaceBlock(api.World, byPlayer, itemslot.Itemstack, blockSel, ref failureCode))
+                if (api is ICoreClientAPI capi && failureCode != null && failureCode != "__ignore__")
                 {
-                    if (api is ICoreClientAPI capi && failureCode != null && failureCode != "__ignore__")
-                    {
-                        capi.TriggerIngameError(this, failureCode, Lang.Get("placefailure-" + failureCode));
-                    }
+                    capi.TriggerIngameError(this, failureCode, Lang.Get("placefailure-" + failureCode));
                 }
-                else
-                {
-                    byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
-
-                    ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
-
-                    if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
-                    {
-                        itemslot.TakeOut(1);
-                        itemslot.MarkDirty();
-                    }
-                }
-
-                handHandling = EnumHandHandling.PreventDefault;
-            }
-        }
-
-        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
-        {
-            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-            dsc.AppendLine(Lang.Get("clipping-item-desc", Code.Domain));
-            return; 
-        }
-
-
-        public override WorldInteraction[] GetHeldInteractionHelp(ItemSlot inSlot)
-        {
-            string alive = Variant["state"];
-            if (alive == "dry")
-            {
-                return null;
             }
             else
             {
-                return interactions.Append(base.GetHeldInteractionHelp(inSlot));
+                byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
+
+                ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+
+                if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
+                {
+                    itemslot.TakeOut(1);
+                    itemslot.MarkDirty();
+                }
             }
+
+            handHandling = EnumHandHandling.PreventDefault;
+        }
+
+        public override WorldInteraction[] GetHeldInteractionHelp(ItemSlot inSlot)
+        {
+            if (Variant["state"] != "dry") return interactions.Append(base.GetHeldInteractionHelp(inSlot));
+            return null;
         }
     }
 }

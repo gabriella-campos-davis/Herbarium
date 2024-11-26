@@ -12,15 +12,10 @@ namespace herbarium
     {
         double totalHoursTillGrowth;
         long growListenerId;
-        public string plantCode;
-        Block block;
 
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-
-            block = api.World.BlockAccessor.GetBlock(Pos);
-            plantCode = block.Attributes["plantCode"].ToString();
 
             if (api is ICoreServerAPI)
             {
@@ -32,12 +27,7 @@ namespace herbarium
         {
             get
             {
-                NatFloat matureDays = NatFloat.create(EnumDistribution.UNIFORM, 7f, 2f);
-                if (Block?.Attributes != null)
-                {
-                    return Block.Attributes["matureDays"].AsObject(matureDays);
-                }
-                return matureDays;
+                return Block?.Attributes?["matureDays"].AsObject<NatFloat>() ?? NatFloat.create(EnumDistribution.UNIFORM, 7f, 2f);
             }
         }
 
@@ -51,36 +41,12 @@ namespace herbarium
 
         private void CheckGrow(float dt)
         {
-            if (Api.World.Calendar.TotalHours < totalHoursTillGrowth)
-                return;
-
             ClimateCondition conds = Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.NowValues);
-            if (conds == null || conds.Temperature < 5)
-            {
-                return;
-            }
 
-            if (conds.Temperature < 0)
-            {
-                totalHoursTillGrowth = Api.World.Calendar.TotalHours + (float)Api.World.Rand.NextDouble() * 72 * GrowthRateMod;
-                return;
-            }
-            ICoreServerAPI sapi = Api as ICoreServerAPI;
+            if (conds?.Temperature < 0) totalHoursTillGrowth = Api.World.Calendar.TotalHours + nextStageDaysRnd.nextFloat(1, Api.World.Rand) * Api.World.Calendar.HoursPerDay * GrowthRateMod;
 
-            Block block = Api.World.BlockAccessor.GetBlock(Pos);
-            if(plantCode is null)
-            {
-                Api.World.Logger.Debug("plantCode is null for " + this.Block.Variant["type"].ToString());
-                return;
-            }
-            Block herbBlock = Api.World.GetBlock(AssetLocation.Create(plantCode));
-
-            if(herbBlock is null)
-            {
-                return;
-            }
-
-            Api.World.BlockAccessor.SetBlock(herbBlock.BlockId, Pos);
+            Block berryBlock = Api.World.GetBlock(AssetLocation.Create(Block.Attributes?["plantCode"].ToString()));
+            if (conds?.Temperature >= 5 && Api.World.Calendar.TotalHours > totalHoursTillGrowth && berryBlock != null) Api.World.BlockAccessor.SetBlock(berryBlock.BlockId, Pos);
         }
         public override void ToTreeAttributes(ITreeAttribute tree)
         {
