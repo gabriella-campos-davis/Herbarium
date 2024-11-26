@@ -1,12 +1,7 @@
 using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
-using Vintagestory.API.Datastructures;
-using Vintagestory.API.MathTools;
-using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
 namespace herbarium
@@ -16,8 +11,6 @@ namespace herbarium
     {
         float offY;
         float curOffY = 0;
-        ICoreClientAPI capi;
-
 
         public string Construction => Variant["construction"];
 
@@ -28,7 +21,6 @@ namespace herbarium
             base.OnLoaded(api);
 
             curOffY = offY = FpHandTransform.Translation.Y;
-            capi = api as ICoreClientAPI;
 
             durabilityGains = Attributes["durabilityGains"].AsObject<Dictionary<string, Dictionary<string, int>>>();
 

@@ -1,7 +1,6 @@
 ﻿using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using Vintagestory.API.Client;
-using Vintagestory.API.MathTools;
 using herbarium.config;
 using BuffStuff;
 using Vintagestory.GameContent;
@@ -21,10 +20,6 @@ namespace herbarium
         {
             return true;
         }
-       public override void AssetsLoaded(ICoreAPI api)
-		{
-			base.AssetsLoaded(api);
-		}
 
         #region Client
         public override void StartClientSide(ICoreClientAPI capi)
@@ -48,7 +43,6 @@ namespace herbarium
             base.Start(api);
             networkHandler = new NetworkHandler();
 
-            //Api = api;
             api.RegisterBlockClass("HerbariumBerryBush", typeof(HerbariumBerryBush));
             api.RegisterBlockClass("PricklyBerryBush", typeof(PricklyBerryBush));
             api.RegisterBlockClass("ShrubBerryBush", typeof(ShrubBerryBush));
