@@ -3,7 +3,7 @@ using Vintagestory.API.MathTools;
 
 namespace herbarium
 {
-    public class StoneBerryPlant : ShrubBerryBush
+    public class StoneBerryPlant : HerbariumBerryBush
     {
         public override bool CanPlantStay(IBlockAccessor blockAccessor, BlockPos pos)
         {

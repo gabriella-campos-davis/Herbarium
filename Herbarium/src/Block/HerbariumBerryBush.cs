@@ -195,7 +195,7 @@ namespace herbarium
         {
             Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
 
-            if(Attributes["stackable"].AsBool())
+            if(Attributes["stackable"].AsBool() && !Attributes["isBottomBlock"].AsBool())
             {
                 if(belowBlock.Attributes?["stackable"].AsBool() ?? false)
                 {
