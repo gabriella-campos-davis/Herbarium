@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 using Vintagestory.GameContent;
@@ -163,7 +164,43 @@ namespace herbarium
             if (tool != EnumTool.Knife &&
                 tool != EnumTool.Shears)
             {
-                base.OnBlockInteractStop(secondsUsed, world, byPlayer, blockSel);
+                if (HasBlockBehavior<BlockBehaviorHarvestable>())
+                {
+                    var beh = GetBehavior<BlockBehaviorHarvestable>();
+
+                    JsonObject properties = JsonObject.FromJson(beh.propertiesAtString);
+
+                    if (secondsUsed > properties["harvestTime"].AsFloat() - 0.05f && beh.harvestedStack != null && world.Side == EnumAppSide.Server)
+                    {
+                        float dropRate = 1;
+
+                        if (Attributes?.IsTrue("forageStatAffected") == true)
+                        {
+                            dropRate *= byPlayer.Entity.Stats.GetBlended("forageDropRate");
+                        }
+
+                        ItemStack stack = beh.harvestedStack.GetNextItemStack(dropRate);
+                        if (stack == null) return;
+                        var origStack = stack.Clone();
+
+                        if (!byPlayer.InventoryManager.TryGiveItemstack(stack))
+                        {
+                            world.SpawnItemEntity(stack, blockSel.Position.ToVec3d().Add(0.5, 0.5, 0.5));
+                        }
+
+                        TreeAttribute tree = new TreeAttribute();
+                        tree["itemstack"] = new ItemstackAttribute(origStack.Clone());
+                        tree["byentityid"] = new LongAttribute(byPlayer.Entity.EntityId);
+                        world.Api.Event.PushEvent("onitemcollected", tree);
+
+                        Block harvestedBlock = null;
+                        if (properties["harvestedBlockCode"].AsString() != null) harvestedBlock = world.GetBlock(AssetLocation.Create(properties["harvestedBlockCode"].AsString(), Code.Domain));
+                        if (harvestedBlock != null) world.BlockAccessor.ExchangeBlock(harvestedBlock.BlockId, blockSel.Position);
+
+                        world.PlaySoundAt(beh.harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+                    }
+                }
+                else base.OnBlockInteractStop(secondsUsed, world, byPlayer, blockSel);
                 return;
             }
 

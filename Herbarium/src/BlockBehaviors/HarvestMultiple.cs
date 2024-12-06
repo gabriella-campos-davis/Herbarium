@@ -117,7 +117,8 @@ namespace herbarium
 
                 if (harvestedBlock != null)
                 {
-                    world.BlockAccessor.SetBlock(harvestedBlock.BlockId, blockSel.Position);
+                    if (world.BlockAccessor.GetBlockEntity(blockSel.Position) is BEHerbariumBerryBush) world.BlockAccessor.ExchangeBlock(harvestedBlock.BlockId, blockSel.Position);
+                    else world.BlockAccessor.SetBlock(harvestedBlock.BlockId, blockSel.Position);
                 }
 
                 world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
