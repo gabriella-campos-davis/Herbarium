@@ -7,7 +7,7 @@ using Vintagestory.API.MathTools;
 
 namespace herbarium 
 {
-    public class BEHerbariumBerryBush : BEBerryPlant
+    public class BEHerbariumBerryBush : BEGroundBerryPlant
     {
         public bool Pruned;
         double LastPrunedTotalDays = -1;
@@ -71,29 +71,28 @@ namespace herbarium
         public override void UpdateHoursLeft(float intervalHours, ref float intervalDays, ref double daysToCheck)
         {
             base.UpdateHoursLeft(intervalHours, ref intervalDays, ref daysToCheck);
-
             if (Pruned) prunedHoursLeft -= intervalHours;
         }
 
-        public override void StopGrowth(float intervalHours)
+        public override bool StopGrowth(float intervalHours)
         {
-            base.StopGrowth(intervalHours);
-
             if (Pruned) prunedHoursLeft += intervalHours;
+
+            return base.StopGrowth(intervalHours);
         }
 
-        public override void ResetGrowth()
+        public override bool ResetGrowth()
         {
-            base.ResetGrowth();
-
             if (Pruned) prunedHoursLeft = GetPrunedHours();
+
+            return base.ResetGrowth();
         }
 
-        public override void RevertGrowth()
+        public override bool RevertGrowth()
         {
-            base.RevertGrowth();
-
             if (Pruned) prunedHoursLeft = GetPrunedHours();
+
+            return base.RevertGrowth();
         }
 
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)

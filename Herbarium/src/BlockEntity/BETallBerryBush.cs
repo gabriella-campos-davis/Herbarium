@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -87,25 +86,25 @@ namespace herbarium
             sproutingHoursLeft -= intervalHours;
         }
 
-        public override void StopGrowth(float intervalHours)
+        public override bool StopGrowth(float intervalHours)
         {
-            base.StopGrowth(intervalHours);
-
             sproutingHoursLeft += intervalHours;
+
+            return base.StopGrowth(intervalHours);
         }
 
-        public override void ResetGrowth()
+        public override bool ResetGrowth()
         {
-            base.ResetGrowth();
-
             sproutingHoursLeft = GetHoursSprouting();
+
+            return base.ResetGrowth();
         }
 
-        public override void RevertGrowth()
+        public override bool RevertGrowth()
         {
-            base.ResetGrowth();
-
             sproutingHoursLeft = GetHoursSprouting();
+
+            return base.ResetGrowth();
         }
 
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
