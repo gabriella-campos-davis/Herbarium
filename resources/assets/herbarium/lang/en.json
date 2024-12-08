@@ -1,3 +1,18 @@
 {
-    "blockhelp-berrybush-clip": "Clip branch"
+    "blockhelp-berrybush-clip": "Clip branch",
+
+    "game:berrybush-too-cold": "Too cold to flower or fruit",
+    "game:berrybush-too-hot": "Too hot to flower or fruit",
+
+    "game:clipping-too-cold": "Too cold to grow",
+    "game:clipping-too-hot": "Too hot to grow",
+
+    "game:berrybush-shed-xdays": "Fresh berries for about {0} days",
+    "game:berrybush-shed-1day": "Fresh berries for less than a day",
+
+    "game:berrybush-sprouting-xdays": "Will sprout new growth in {0} days",
+    "game:berrybush-sprouting-1day": "Will sprout new growth in less than a day",
+
+    "game:berrybush-clipping-growth-xdays": "Will regrow pruned branches in {0} days",
+    "game:berrybush-clipping-growth-1day": "Will regrow pruned branches in less than a day"
 }

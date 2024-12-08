@@ -1,0 +1,18 @@
+{
+    "blockhelp-berrybush-clip": "Przyciąć gałąź",
+
+    "game:berrybush-too-cold": "Za zimno żeby kwitnąć lub owocować",
+    "game:berrybush-too-hot": "Za gorąco żeby kwitnąć lub owocować",
+
+    "game:clipping-too-cold": "Za zimno żeby rosnąć",
+    "game:clipping-too-hot": "Za gorąco żeby rosnąć",
+
+    "game:berrybush-shed-xdays": "Świeże jagody przez około {0} dni",
+    "game:berrybush-shed-1day": "Świeże jagody przez mniej niż jeden dzień",
+
+    "game:berrybush-sprouting-xdays": "Wypuści nowy przerost za około {0} dni",
+    "game:berrybush-sprouting-1day": "Wypuści nowy przerost za mniej niż jeden dzień",
+
+    "game:berrybush-clipping-growth-xdays": "Odrośnie przycięte gałęzie za około {0} dni",
+    "game:berrybush-clipping-growth-1day": "Odrośnie przycięte gałęzie za mniej niż jeden dzień"
+}

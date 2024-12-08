@@ -1,4 +1,3 @@
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
@@ -19,26 +18,18 @@ namespace herbarium
         {
              base.OnLoaded(api);
 
-            maxDepth = this.Attributes["maxDepth"].AsInt();
-            minDepth = this.Attributes["minDepth"].AsInt();
-            waterCode = this.Attributes["waterCode"].AsString();
+            maxDepth = Attributes["maxDepth"].AsInt();
+            minDepth = Attributes["minDepth"].AsInt();
+            waterCode = Attributes["waterCode"].AsString();
 
         }
 
         public override bool CanPlantStay(IBlockAccessor blockAccessor, BlockPos pos)
         {
-            Block aboveBlock = blockAccessor.GetBlock(pos.UpCopy(), BlockLayersAccess.Fluid);
-            Block belowBlock = blockAccessor.GetBlock(pos.DownCopy(), BlockLayersAccess.Fluid);
+            Block aboveFluid = blockAccessor.GetBlock(pos.UpCopy(), BlockLayersAccess.Fluid);
+            Block belowFluid = blockAccessor.GetBlock(pos.DownCopy(), BlockLayersAccess.Fluid);
 
-            if(aboveBlock.LiquidCode != waterCode || aboveBlock is not GiantKelp)
-            {
-                return false;
-            }
-            if(belowBlock.LiquidCode != waterCode || belowBlock is not GiantKelp)
-            {
-                return false;
-            }
-
+            if(aboveFluid.LiquidCode != waterCode || aboveFluid is not GiantKelp || belowFluid.LiquidCode != waterCode || belowFluid is not GiantKelp) return false;
             return true;
         }
 
@@ -88,7 +79,6 @@ namespace herbarium
 
             if (belowBlock.LiquidCode == waterCode)
             {
-                if(belowBlock.LiquidCode != waterCode) return false;
                 for(var currentDepth = 1; currentDepth <= maxDepth + 1; currentDepth ++)
                 {
                     belowBlock = blockAccessor.GetBlock(pos.X, pos.Y - currentDepth, pos.Z);
