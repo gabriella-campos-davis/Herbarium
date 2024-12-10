@@ -117,18 +117,29 @@ namespace herbarium
         public override void GetMainInfo(IPlayer forPlayer, StringBuilder sb)
         {
             base.GetMainInfo(forPlayer, sb);
+            string failureCode = "";
 
-            if (CanSprout() & !simplifiedTooltips && TemperatureState == EnumHBBTemp.Acceptable)
+            if (!simplifiedTooltips)
             {
-                double daysleft = sproutingHoursLeft / Api.World.Calendar.HoursPerDay;
+                if (CanSprout())
+                {
+                    if (TemperatureState == EnumHBBTemp.Acceptable)
+                    {
+                        double daysleft = sproutingHoursLeft / Api.World.Calendar.HoursPerDay;
 
-                if (daysleft < 1)
-                {
-                    sb.AppendLine(Lang.Get("berrybush-sprouting-1day"));
+                        if (daysleft < 1)
+                        {
+                            sb.AppendLine(Lang.Get("berrybush-sprouting-1day"));
+                        }
+                        else
+                        {
+                            sb.AppendLine(Lang.Get("berrybush-sprouting-xdays", (int)daysleft));
+                        }
+                    }
                 }
-                else
+                else if ((growthBlock as BlockClipping)?.CanPlaceClipping(Api.World.BlockAccessor, Pos.UpCopy(), ref failureCode) != null)
                 {
-                    sb.AppendLine(Lang.Get("berrybush-sprouting-xdays", (int)daysleft));
+                    if (failureCode == "fruitvineclipping-nosupport") sb.AppendLine(Lang.Get("fruitingvine-sprouting-nosupport"));
                 }
             }
         }

@@ -50,11 +50,14 @@ namespace herbarium
 
         protected override bool DoGrow()
         {
-            if ((Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes?["isLarge"].AsBool() ?? false) &&
+            Block belowBlock = Api.World.BlockAccessor.GetBlock(Pos.DownCopy());
+
+            if (((belowBlock.Attributes?["isLarge"].AsBool() ?? false) || (belowBlock.Attributes?["isHuge"].AsBool() ?? false)) &&
                 (!Api.World.BlockAccessor.GetBlock(Pos.DownCopy(2)).Attributes?["isBottomBlock"].AsBool() ?? false) &&
+                (!Api.World.BlockAccessor.GetBlock(Pos.DownCopy(3)).Attributes?["isBottomBlock"].AsBool() ?? false) &&
                 (Block.Attributes?["isGrowth"].AsBool() ?? false))
             {
-                Block newBottomBlock = Api.World.GetBlock(AssetLocation.Create(Api.World.BlockAccessor.GetBlock(Pos.DownCopy()).Attributes?["bottomBlock"].ToString()));
+                Block newBottomBlock = Api.World.GetBlock(AssetLocation.Create(belowBlock.Attributes?["bottomBlock"].ToString()));
 
                 if (newBottomBlock is null) return true;
 
@@ -63,6 +66,19 @@ namespace herbarium
             string blockCode = Block.Attributes?["bushCode"].ToString();
             if (blockCode == null) blockCode = Block.Attributes?["plantCode"].ToString();
             Block newBushBlock = Api.World.GetBlock(AssetLocation.Create(blockCode));
+
+            if (Block is BlockVineClipping)
+            {
+                BlockFacing facing = BlockFacing.FromCode(Block.Code.EndVariant());
+
+                BlockPos attachingBlockPos = Pos.AddCopy(facing);
+                Block attachingBlock = Api.World.BlockAccessor.GetBlock(attachingBlockPos);
+
+                if (!attachingBlock.CanAttachBlockAt(Api.World.BlockAccessor, newBushBlock, attachingBlockPos, facing.Opposite, null))
+                {
+                    newBushBlock = Api.World.BlockAccessor.GetBlock(newBushBlock.CodeWithVariant("side", "down"));
+                }
+            }
 
             if (newBushBlock is null) return true;
 

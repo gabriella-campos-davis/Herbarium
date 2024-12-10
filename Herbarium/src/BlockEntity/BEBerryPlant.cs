@@ -21,7 +21,7 @@ namespace herbarium
 
     public class BEBerryPlant : BlockEntity
     {
-        protected double lastCheckAtTotalDays = 0;
+        public double lastCheckAtTotalDays = 0;
         protected double transitionHoursLeft = -1;
 
         protected RoomRegistry roomreg;
@@ -37,8 +37,8 @@ namespace herbarium
 
         public EnumHBBTemp TemperatureState { get { return temperatureState; } }
 
-        protected float growthRateMul = HerbariumConfig.Current.berryGrowthRateMul.Value;
-        protected bool growByMonth = HerbariumConfig.Current.berriesGrowByMonth.Value;
+        public float growthRateMul = HerbariumConfig.Current.berryGrowthRateMul.Value;
+        public bool growByMonth = HerbariumConfig.Current.berriesGrowByMonth.Value;
         protected bool simplifiedTooltips = HerbariumConfig.Current.simplifiedBerryTooltips.Value;
 
         public BEBerryPlant() : base()
@@ -92,11 +92,45 @@ namespace herbarium
 
         protected virtual float IntervalHours(double daysToCheck)
         {
+            bool preventDefault = false;
+            float result = 0;
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                float bhresult;
+
+                EnumHandling handled = EnumHandling.PassThrough;
+                bhresult = behavior.IntervalHours(daysToCheck, ref handled) ?? result;
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                    result = bhresult;
+                }
+                if (handled == EnumHandling.PreventSubsequent) return bhresult;
+            }
+
+            if (preventDefault) return result;
+
             return  Math.Clamp((float)(daysToCheck / Api.World.Calendar.DaysPerMonth) * 2f, 2f, Api.World.Calendar.DaysPerMonth * Api.World.Calendar.HoursPerDay);
         }
 
         public virtual void OnGrowth(double lastCheck)
         {
+            bool preventDefault = false;
+
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                EnumHandling handled = EnumHandling.PassThrough;
+                behavior.OnGrowth(lastCheck, ref handled);
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                }
+
+                if (handled == EnumHandling.PreventSubsequent) return;
+            }
+
+            if (preventDefault) return;
+
             lastCheckAtTotalDays = lastCheck;
             transitionHoursLeft = GetHoursForNextStage();
             CheckGrow(0);
@@ -156,6 +190,24 @@ namespace herbarium
 
         protected virtual bool CheckGrowExtra()
         {
+            bool preventDefault = false;
+            bool result = false;
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                bool bhresult;
+
+                EnumHandling handled = EnumHandling.PassThrough;
+                bhresult = behavior.CheckGrowExtra(ref handled) ?? result;
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                    result |= bhresult;
+                }
+                if (handled == EnumHandling.PreventSubsequent) return bhresult;
+            }
+
+            if (preventDefault) return result;
+
             return false;
         }
 
@@ -204,6 +256,22 @@ namespace herbarium
 
         public virtual void UpdateHoursLeft(float intervalHours, ref float intervalDays, ref double daysToCheck)
         {
+            bool preventDefault = false;
+
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                EnumHandling handled = EnumHandling.PassThrough;
+                behavior.UpdateHoursLeft(intervalHours, ref intervalDays, ref daysToCheck, ref handled);
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                }
+
+                if (handled == EnumHandling.PreventSubsequent) return;
+            }
+
+            if (preventDefault) return;
+
             intervalDays = intervalHours / Api.World.Calendar.HoursPerDay;
             daysToCheck -= intervalDays;
             lastCheckAtTotalDays += intervalDays;
@@ -212,6 +280,24 @@ namespace herbarium
 
         public virtual bool StopGrowth(float intervalHours)
         {
+            bool preventDefault = false;
+            bool result = false;
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                bool bhresult;
+
+                EnumHandling handled = EnumHandling.PassThrough;
+                bhresult = behavior.StopGrowth(intervalHours, ref handled) ?? result;
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                    result |= bhresult;
+                }
+                if (handled == EnumHandling.PreventSubsequent) return bhresult;
+            }
+
+            if (preventDefault) return result;
+
             if (!IsRipe()) transitionHoursLeft += intervalHours;
 
             return false;
@@ -219,6 +305,24 @@ namespace herbarium
 
         public virtual bool ResetGrowth()
         {
+            bool preventDefault = false;
+            bool result = false;
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                bool bhresult;
+
+                EnumHandling handled = EnumHandling.PassThrough;
+                bhresult = behavior.ResetGrowth(ref handled) ?? result;
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                    result |= bhresult;
+                }
+                if (handled == EnumHandling.PreventSubsequent) return bhresult;
+            }
+
+            if (preventDefault) return result;
+
             if (!IsRipe()) transitionHoursLeft = GetHoursForNextStage();
 
             return false;
@@ -226,6 +330,24 @@ namespace herbarium
 
         public virtual bool RevertGrowth()
         {
+            bool preventDefault = false;
+            bool result = false;
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                bool bhresult;
+
+                EnumHandling handled = EnumHandling.PassThrough;
+                bhresult = behavior.RevertGrowth(ref handled) ?? result;
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                    result |= bhresult;
+                }
+                if (handled == EnumHandling.PreventSubsequent) return bhresult;
+            }
+
+            if (preventDefault) return result;
+
             if (Block.Variant["state"] != "empty")
             {
                 Block nextBlock = Api.World.GetBlock(Block.CodeWithVariant("state", "empty"));

@@ -12,11 +12,18 @@
 
     "game:berrybush-sprouting-xdays": "Sprouts growth in about {0} days",
     "game:berrybush-sprouting-1day": "Sprouts growth in less than a day",
+    "game:fruitingvine-sprouting-nosupport": "Cannot sprout without proper support",
 
     "game:berrybush-clipping-growth-xdays": "Grows branches in about {0} days",
     "game:berrybush-clipping-growth-1day": "Grows branches in less than a day"
 
     "game:placefailure-berrybushclipping": "A berry bush clipping must be placed on soil or grafted on top of a berry bush",
+    "game:placefailure-berrybushclipping-vinemix": "Cannot graft bush clippings onto fruiting vines",
     "game:placefailure-berrybushclipping-nottallbush": "Cannot graft bush clippings onto this bush",
-    "game:placefailure-berrybushclipping-tootall": "Bush is too tall to graft a clipping onto"
+    "game:placefailure-berrybushclipping-tootall": "Bush is too tall to graft a clipping onto",
+
+    "game:placefailure-fruitvineclipping": "A vine clipping must be placed on soil or grafted on top of fruiting vines",
+    "game:placefailure-fruitvineclipping-bushmix": "Cannot graft vine clippings onto berry bushes",
+    "game:placefailure-fruitvineclipping-nosupport": "Cannot graft vine clippings without a block for support",
+    "game:placefailure-fruitvineclipping-tootall": "Vines are too tall to graft a clipping onto"
 }

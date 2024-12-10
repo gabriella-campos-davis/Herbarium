@@ -69,6 +69,22 @@ namespace herbarium
 
         public virtual void GetMainInfo(IPlayer forPlayer, StringBuilder sb)
         {
+            bool preventDefault = false;
+
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                EnumHandling handled = EnumHandling.PassThrough;
+                behavior.GetMainInfo(forPlayer, sb, ref handled);
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                }
+
+                if (handled == EnumHandling.PreventSubsequent) return;
+            }
+
+            if (preventDefault) return;
+
             if ((!simplifiedTooltips && (temperatureState == EnumHBBTemp.Acceptable || IsRipe())) || (!IsRipe() && simplifiedTooltips))
             {
                 double daysleft = transitionHoursLeft / Api.World.Calendar.HoursPerDay;
@@ -88,6 +104,22 @@ namespace herbarium
 
         public virtual void GetExtraInfo(IPlayer forPlayer, StringBuilder sb)
         {
+            bool preventDefault = false;
+
+            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            {
+                EnumHandling handled = EnumHandling.PassThrough;
+                behavior.GetExtraInfo(forPlayer, sb, ref handled);
+                if (handled != EnumHandling.PassThrough)
+                {
+                    preventDefault = true;
+                }
+
+                if (handled == EnumHandling.PreventSubsequent) return;
+            }
+
+            if (preventDefault) return;
+
             if (!simplifiedTooltips)
             {
                 if (temperatureState < EnumHBBTemp.Acceptable)

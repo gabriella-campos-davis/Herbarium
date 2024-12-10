@@ -55,6 +55,14 @@ namespace herbarium
             Block clipBlock = byEntity.World.GetBlock(AssetLocation.Create((blockEntity is BETallBerryBush ? "scion-" : "clipping-") + Variant["type"] + "-alive", Code.Domain));
             IPlayer byPlayer = (byEntity is EntityPlayer) ? byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID) : null;
 
+            if (Attributes?["isVine"].AsBool() ?? false)
+            {
+                string facing = Block.SuggestedHVOrientation(byPlayer, blockSel)[0].Code;
+                if (selBlock is BlockFruitingVines || selBlock is BlockTreeVine) facing = selBlock.Code.EndVariant();
+
+                clipBlock = byEntity.World.GetBlock(AssetLocation.Create((blockEntity is BETallBerryBush ? "vinescion-" : "vineclipping-") + Variant["type"] + "-alive-" + facing, Code.Domain));
+            }
+
             blockSel = blockSel.Clone();
             blockSel.Position.Up();
 
