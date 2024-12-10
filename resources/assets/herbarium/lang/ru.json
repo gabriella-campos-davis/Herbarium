@@ -1,3 +1,30 @@
 {
-    "blockhelp-berrybush-clip": "Обрезать ветку"
+    "blockhelp-berrybush-clip": "Обрезать ветку",
+
+    "game:berrybush-too-cold": "Слишком холодно чтобы цвести и плодоносить",
+    "game:berrybush-too-hot": "Слишком жарко чтобы цвести и плодоносить",
+
+    "game:clipping-too-cold": "Слишком холодно чтобы расти",
+    "game:clipping-too-hot": "Слишком жарко чтобы расти",
+
+    "game:berrybush-shed-xdays": "Свежие ягоды ещё {0} дней",
+    "game:berrybush-shed-1day": "Свежие ягоды, опадут меньше чем через день",
+
+    "game:berrybush-sprouting-xdays": "Пустит новую поросль через {0} дней",
+    "game:berrybush-sprouting-1day": "Пустит новую поросль меньше чем через день",
+
+    "game:berrybush-clipping-growth-xdays": "Отрастит обрезанные ветки через {0} дней",
+    "game:berrybush-clipping-growth-1day": "Отрастит обрезанные ветки меньше чем через день",
+
+    "game:fruitingvine-sprouting-nosupport": "Не может вырасти выше без подходящей опоры",
+
+    "game:placefailure-berrybushclipping": "Посадите обрезок в почву или привейте на подходящий подвой",
+    "game:placefailure-berrybushclipping-vinemix": "Обрезки кустов нельзя привить на лозу",
+    "game:placefailure-berrybushclipping-nottallbush": "Этот куст не подходит в качестве подвоя",
+    "game:placefailure-berrybushclipping-tootall": "Этот куст слишком высокий для прививки",
+
+    "game:placefailure-fruitvineclipping": "Посадите обрезок в почву или привейте на подходящий подвой",
+    "game:placefailure-fruitvineclipping-bushmix": "Обрезки лозы нельзя привить на кусты",
+    "game:placefailure-fruitvineclipping-nosupport": "Привою необходима подходящая опора",
+    "game:placefailure-fruitvineclipping-tootall": "Эта лоза слишком длинная для прививки"
 }
