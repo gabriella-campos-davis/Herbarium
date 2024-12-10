@@ -1,7 +1,6 @@
 ﻿using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using Vintagestory.API.Client;
-using Vintagestory.API.MathTools;
 using herbarium.config;
 using BuffStuff;
 using Vintagestory.GameContent;
@@ -21,10 +20,6 @@ namespace herbarium
         {
             return true;
         }
-       public override void AssetsLoaded(ICoreAPI api)
-		{
-			base.AssetsLoaded(api);
-		}
 
         #region Client
         public override void StartClientSide(ICoreClientAPI capi)
@@ -48,12 +43,15 @@ namespace herbarium
             base.Start(api);
             networkHandler = new NetworkHandler();
 
-            //Api = api;
             api.RegisterBlockClass("HerbariumBerryBush", typeof(HerbariumBerryBush));
             api.RegisterBlockClass("PricklyBerryBush", typeof(PricklyBerryBush));
-            api.RegisterBlockClass("ShrubBerryBush", typeof(ShrubBerryBush));
+            api.RegisterBlockClass("ShrubBerryBush", typeof(HerbariumBerryBush));
             api.RegisterBlockClass("GroundBerryPlant", typeof(GroundBerryPlant));
             api.RegisterBlockClass("BlockClipping", typeof(BlockClipping));
+
+            api.RegisterBlockClass("BlockVineClipping", typeof(BlockVineClipping));
+            api.RegisterBlockClass("BlockFruitingVines", typeof(BlockFruitingVines));
+            api.RegisterBlockClass("BlockTreeVine", typeof(BlockTreeVine));
 
             api.RegisterBlockClass("StoneBerryPlant", typeof(StoneBerryPlant));
             api.RegisterBlockClass("StonePlant", typeof(StonePlant));
@@ -75,11 +73,11 @@ namespace herbarium
             api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestMultiple));
            
             api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
-            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEShrubBerryBush));
+            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEHerbariumBerryBush));
             api.RegisterBlockEntityClass("BETallBerryBush", typeof(BETallBerryBush));
             api.RegisterBlockEntityClass("BEClipping", typeof(BEClipping));
             api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
-            api.RegisterBlockEntityClass("BESeedling", typeof(BESeedling));
+            api.RegisterBlockEntityClass("BESeedling", typeof(BEClipping));
 
             api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BEHerbariumSapling));
 

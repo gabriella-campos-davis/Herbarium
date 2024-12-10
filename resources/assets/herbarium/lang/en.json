@@ -1,3 +1,30 @@
 {
-    "blockhelp-berrybush-clip": "Clip branch"
+    "blockhelp-berrybush-clip": "Clip branch",
+
+    "game:berrybush-too-cold": "Too cold to flower or fruit",
+    "game:berrybush-too-hot": "Too hot to flower or fruit",
+
+    "game:clipping-too-cold": "Too cold to grow",
+    "game:clipping-too-hot": "Too hot to grow",
+
+    "game:berrybush-shed-xdays": "Fresh berries for about {0} days",
+    "game:berrybush-shed-1day": "Fresh berries for less than a day",
+
+    "game:berrybush-sprouting-xdays": "Will sprout new growth in {0} days",
+    "game:berrybush-sprouting-1day": "Will sprout new growth in less than a day",
+
+    "game:berrybush-clipping-growth-xdays": "Will regrow pruned branches in {0} days",
+    "game:berrybush-clipping-growth-1day": "Will regrow pruned branches in less than a day",
+
+    "game:fruitingvine-sprouting-nosupport": "Cannot grow taller without proper support",
+
+    "game:placefailure-berrybushclipping": "A clipping must be planted in soil or grafted onto proper stock",
+    "game:placefailure-berrybushclipping-vinemix": "Cannot graft bush clippings onto vines",
+    "game:placefailure-berrybushclipping-nottallbush": "This bush is not a proper stock",
+    "game:placefailure-berrybushclipping-tootall": "This bush is too tall for grafting",
+
+    "game:placefailure-fruitvineclipping": "A clipping must be planted in soil or grafted onto proper stock",
+    "game:placefailure-fruitvineclipping-bushmix": "Cannot graft vine clippings onto bushes",
+    "game:placefailure-fruitvineclipping-nosupport": "Cannot graft vine clippings without proper support",
+    "game:placefailure-fruitvineclipping-tootall": "This vine is too long for grafting"
 }

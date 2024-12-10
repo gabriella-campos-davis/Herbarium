@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Config;
 using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
@@ -17,7 +15,6 @@ namespace herbarium
         {
 
             if (api.Side != EnumAppSide.Client) return;
-            ICoreClientAPI capi = api as ICoreClientAPI;
 
             interactions = ObjectCacheUtil.GetOrCreate(api, "treeSeedInteractions", () =>
             {
