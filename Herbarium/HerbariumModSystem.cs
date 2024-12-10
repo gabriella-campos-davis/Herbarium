@@ -49,6 +49,10 @@ namespace herbarium
             api.RegisterBlockClass("GroundBerryPlant", typeof(GroundBerryPlant));
             api.RegisterBlockClass("BlockClipping", typeof(BlockClipping));
 
+            api.RegisterBlockClass("BlockVineClipping", typeof(BlockVineClipping));
+            api.RegisterBlockClass("BlockFruitingVines", typeof(BlockFruitingVines));
+            api.RegisterBlockClass("BlockTreeVine", typeof(BlockTreeVine));
+
             api.RegisterBlockClass("StoneBerryPlant", typeof(StoneBerryPlant));
             api.RegisterBlockClass("StonePlant", typeof(StonePlant));
 

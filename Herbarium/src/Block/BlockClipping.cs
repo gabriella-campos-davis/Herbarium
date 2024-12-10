@@ -24,7 +24,8 @@ namespace herbarium
             string failureCodeOld = failureCode;
             Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
 
-            if (belowBlock is HerbariumBerryBush)
+            if (belowBlock is BlockFruitingVines || belowBlock is BlockTreeVine) failureCode = "berrybushclipping-vinemix";
+            else if (belowBlock is HerbariumBerryBush)
             {
                 Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
                 bool isLarge = (belowBlock.Attributes?["isLarge"].AsBool() ?? false) && (belowBelowBlock.Attributes?["isBottomBlock"].AsBool() ?? false);
