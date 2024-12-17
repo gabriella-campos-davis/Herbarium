@@ -1,7 +1,6 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
-using Vintagestory.API.Client.Tesselation;
 using System;
 
 namespace herbarium
@@ -19,7 +18,6 @@ namespace herbarium
         public int rootDepth = 2;
         bool checkForRivers = false;
         int duckweedPoints = 0;
-
 
 
         public override void OnLoaded(ICoreAPI api)
@@ -54,7 +52,7 @@ namespace herbarium
             Block block = blockAccessor.GetBlock(pos.DownCopy(), BlockLayersAccess.Fluid);
             Block upblock = blockAccessor.GetBlock(pos, BlockLayersAccess.Fluid);
             if (block.LiquidCode != "water") return false;
-            if (blockAccessor.GetBlock(pos.X, pos.Y - growthDepth, pos.Z, BlockLayersAccess.Fluid).Id != 0) return false;
+            if (blockAccessor.GetBlock(pos.DownCopy(growthDepth), BlockLayersAccess.Fluid).Id != 0) return false;
             if(block.Attributes["pushVector"].Exists)
             {
                 return false;
@@ -130,14 +128,14 @@ namespace herbarium
             base.OnNeighbourBlockChange(world, pos, neibpos);
         }
 
-        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, LCGRandom worldGenRand)
+        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldgenRandom, BlockPatchAttributes attributes = null)
         {
             // Don't spawn in 4 deep water
-            if (blockAccessor.GetBlock(pos.X, pos.Y - growthDepth, pos.Z, BlockLayersAccess.Fluid).Id != 0) return false;
+            if (blockAccessor.GetBlock(pos.DownCopy(growthDepth), BlockLayersAccess.Fluid).Id != 0) return false;
 
             //if()
 
-            return base.TryPlaceBlockForWorldGen(blockAccessor, pos, onBlockFace, worldGenRand);
+            return base.TryPlaceBlockForWorldGen(blockAccessor, pos, onBlockFace, worldgenRandom, attributes);
         }
 
         public override bool ShouldReceiveServerGameTicks(IWorldAccessor world, BlockPos pos, Random offThreadRandom, out object extra)
@@ -184,13 +182,13 @@ namespace herbarium
                 //find the lakebed, place the root, then die
                 while(lakeBed == false)
                 {
-                    belowBlock = world.BlockAccessor.GetBlock(pos.X, pos.DownCopy(currentDepth).Y, pos.Z);
+                    belowBlock = world.BlockAccessor.GetBlock(pos.DownCopy(currentDepth));
                     if (belowBlock.LiquidCode != "water" && belowBlock.BlockMaterial != EnumBlockMaterial.Plant)
                     {
                         Block placingBlock = world.BlockAccessor.GetBlock(new AssetLocation(Attributes["rootBlock"].ToString()));
                         if (placingBlock == null) return;
 
-                        if(world.BlockAccessor.GetBlock(pos.X, pos.DownCopy(currentDepth-1).Y, pos.Z).BlockMaterial ==  EnumBlockMaterial.Plant) return;
+                        if(world.BlockAccessor.GetBlock(pos.DownCopy(currentDepth-1)).BlockMaterial ==  EnumBlockMaterial.Plant) return;
                         if(currentDepth > rootDepth) return;
                         world.BlockAccessor.SetBlock(placingBlock.BlockId, pos.DownCopy(currentDepth - 1));
 

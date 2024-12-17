@@ -1,4 +1,3 @@
-using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
@@ -11,14 +10,11 @@ namespace herbarium
         long growListenerId;
         
         float swampyPoint = 8;
-        Block block;
 
         
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            
-            block = api.World.BlockAccessor.GetBlock(Pos);
 
             if (api is ICoreServerAPI)
             {
@@ -28,34 +24,21 @@ namespace herbarium
 
         public override void OnBlockPlaced(ItemStack byItemStack)
         {
-            ICoreServerAPI sapi = Api as ICoreServerAPI;
+
         }
 
 
         private void CheckGrow(float dt)
         {
-            if (Api.World.Calendar.TotalHours < totalHoursTillGrowth)
-                return;
+            if (Api.World.Calendar.TotalHours < totalHoursTillGrowth) return;
 
             ClimateCondition conds = Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.NowValues);
-            if (conds == null)
-            {
-                return;
-            }
-
-            BlockPos nPos = Pos.UpCopy(1);
-            if (conds.Temperature > swampyPoint)
-            {
-                DoGrow();
-                return;
-            }
-
-
+            if (conds?.Temperature > swampyPoint) DoGrow();
         }
+
         private void DoGrow()
         {
-            Random rand = new Random();
-            if (rand.Next(0, 10) > 8)
+            if (Api.World.Rand.Next(0, 10) > 8)
             {
                 bool lakeTop = false;
                 int currentDepth = 1;
@@ -79,28 +62,27 @@ namespace herbarium
                 */
                 while(lakeTop == false)
                 {
-                    aboveBlock = this.Api.World.BlockAccessor.GetBlock(Pos.UpCopy(currentDepth));
+                    aboveBlock = Api.World.BlockAccessor.GetBlock(Pos.UpCopy(currentDepth));
 
                     if (aboveBlock.LiquidCode != "water")
                     {
                         //if the block ontop of the lake is already duckweed we dont need to be here
-                        if(aboveBlock.FirstCodePart() == "duckweed") this.Api.World.BlockAccessor.SetBlock(0, Pos);
+                        if(aboveBlock.FirstCodePart() == "duckweed") Api.World.BlockAccessor.SetBlock(0, Pos);
 
-                        Block placingBlock = this.Api.World.BlockAccessor.GetBlock(new AssetLocation(Block.Attributes["duckweedBlock"].ToString()));
+                        Block placingBlock = Api.World.BlockAccessor.GetBlock(new AssetLocation(Block.Attributes["duckweedBlock"].ToString()));
                         if (placingBlock == null)
                         {
-                            this.Api.World.Logger.Chat("duckwwed root tried place block and it's null. returns");
+                            Api.World.Logger.Chat("duckwwed root tried place block and it's null. returns");
                             return;
                         } 
 
-                        this.Api.World.BlockAccessor.SetBlock(placingBlock.BlockId, Pos.UpCopy(currentDepth));
+                        Api.World.BlockAccessor.SetBlock(placingBlock.BlockId, Pos.UpCopy(currentDepth));
                         lakeTop = true;
                     }
 
                     currentDepth += 1;
                 }
-                this.Api.World.BlockAccessor.SetBlock(0, Pos);
-                
+                Api.World.BlockAccessor.SetBlock(0, Pos);
             }
         }
     }
