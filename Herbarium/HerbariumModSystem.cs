@@ -7,9 +7,9 @@ using Vintagestory.GameContent;
 
 
 [assembly: ModInfo( "Herbarium Plant Library",
-	Description = "Adds implements various useful classes related to plants for other mods to use",
+	Description = "Implements various useful classes related to plants for other mods to use",
 	Website     = "",
-	Authors     = new []{ "gabb", "CATASTEROID" } )]
+	Authors     = new []{ "gabb", "pizza2004", "CATASTEROID" } )]
 
 namespace herbarium
 {
