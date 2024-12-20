@@ -78,10 +78,14 @@ namespace herbarium
             api.RegisterBlockEntityClass("BEClipping", typeof(BEClipping));
             api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
             api.RegisterBlockEntityClass("BESeedling", typeof(BEClipping));
+            api.RegisterBlockEntityClass("MelonVine", typeof(BlockEntityMelonVine));
 
             api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BlockEntitySapling));
 
             api.RegisterBlockEntityClass("BEDuckWeedRoot", typeof(BEDuckWeedRoot));
+
+            api.RegisterBlockEntityBehaviorClass("RootSuckers", typeof(BEBehaviorRootSuckers));
+            api.RegisterCropBehavior("Melon", typeof(MelonCropBehavior));
 
             api.RegisterItemClass("ItemClipping", typeof(ItemClipping));
             api.RegisterItemClass("ItemBerrySeed", typeof(ItemBerrySeed));
