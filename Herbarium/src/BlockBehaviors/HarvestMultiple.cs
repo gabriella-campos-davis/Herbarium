@@ -2,19 +2,21 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Util;
 
 namespace herbarium
 {
     public class BlockBehaviorHarvestMultiple : BlockBehavior
     {
         float harvestTime;
+        bool exchangeBlock;
         public BlockDropItemStack[] harvestedStacks;
 
         public AssetLocation harvestingSound;
 
-        AssetLocation harvestedBlockCode;
-        Block harvestedBlock;
-        string interactionHelpCode;
+        protected AssetLocation harvestedBlockCode;
+        protected Block harvestedBlock;
+        protected string interactionHelpCode;
 
         public BlockBehaviorHarvestMultiple(Block block) : base(block)
         {
@@ -27,32 +29,20 @@ namespace herbarium
             interactionHelpCode = properties["harvestTime"].AsString("blockhelp-harvetable-harvest");
             harvestTime = properties["harvestTime"].AsFloat(0);
             harvestedStacks = properties["harvestedStacks"].AsObject<BlockDropItemStack[]>(null);
-            //properties[].AsObject<BlockDropItemStack>(null);
+            exchangeBlock = properties["exchangeBlock"].AsBool(false);
 
             string code = properties["harvestingSound"].AsString("game:sounds/block/leafy-picking");
-            if (code != null) {
-                harvestingSound = AssetLocation.Create(code, block.Code.Domain);
-            }
+            if (code != null) harvestingSound = AssetLocation.Create(code, block.Code.Domain);
 
             code = properties["harvestedBlockCode"].AsString();
-            if (code != null)
-            {
-                harvestedBlockCode = AssetLocation.Create(code, block.Code.Domain);
-            }
+            if (code != null) harvestedBlockCode = AssetLocation.Create(code, block.Code.Domain);
         }
 
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
 
-            if(harvestedStacks is not null )
-            {
-                for(int i = 0; i < harvestedStacks.Length; i++)
-                {
-                    harvestedStacks[i]?.Resolve(api.World, "harvestedStack of block ", block.Code);
-                }
-            }
-
+            harvestedStacks.Foreach(harvestedStack => harvestedStack?.Resolve(api.World, "harvestedStack of block ", block.Code));
 
             harvestedBlock = api.World.GetBlock(harvestedBlockCode);
             if (harvestedBlock == null)
@@ -63,23 +53,15 @@ namespace herbarium
 
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel, ref EnumHandling handling)
         {
-            if (!world.Claims.TryAccess(byPlayer, blockSel.Position, EnumBlockAccessFlags.Use))
-            {
-                return false;
-            }
+            if (!world.Claims.TryAccess(byPlayer, blockSel.Position, EnumBlockAccessFlags.Use)) return false;
             
             handling = EnumHandling.PreventDefault;
 
-
-            for(int i = 0; i < harvestedStacks.Length; i++)
+            if (harvestedStacks != null)
             {
-                if (harvestedStacks[i] != null)
-                {
-                    world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
-                    return true;
-                }
+                world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+                return true;
             }
-            
 
             return false;
         }
@@ -109,7 +91,6 @@ namespace herbarium
         {
             handled = EnumHandling.PreventDefault;
 
-
             if (secondsUsed > harvestTime - 0.05f && harvestedStacks != null && world.Side == EnumAppSide.Server)
             {
                 float dropRate = 1;
@@ -119,13 +100,13 @@ namespace herbarium
                     dropRate *= byPlayer.Entity.Stats.GetBlended("forageDropRate");
                 }
 
-                for(int i = 0; i < harvestedStacks.Length; i++)
+                harvestedStacks.Foreach(harvestedStack => 
                 {
-                    ItemStack stack = harvestedStacks[i].GetNextItemStack(dropRate);
-                    if (stack == null) continue;
+                    ItemStack stack = harvestedStack.GetNextItemStack(dropRate);
+                    if (stack == null) return;
                     var origStack = stack.Clone();
 
-                    if (byPlayer?.InventoryManager.TryGiveItemstack(stack) == false)
+                    if (!byPlayer.InventoryManager.TryGiveItemstack(stack))
                     {
                         world.SpawnItemEntity(stack, blockSel.Position.ToVec3d().Add(0.5, 0.5, 0.5));
                     }
@@ -134,11 +115,12 @@ namespace herbarium
                     tree["itemstack"] = new ItemstackAttribute(origStack.Clone());
                     tree["byentityid"] = new LongAttribute(byPlayer.Entity.EntityId);
                     world.Api.Event.PushEvent("onitemcollected", tree);
-                }
+                });
 
                 if (harvestedBlock != null)
                 {
-                    world.BlockAccessor.SetBlock(harvestedBlock.BlockId, blockSel.Position);
+                    if (!exchangeBlock) world.BlockAccessor.SetBlock(harvestedBlock.BlockId, blockSel.Position);
+                    else world.BlockAccessor.ExchangeBlock(harvestedBlock.BlockId, blockSel.Position);
                 }
 
                 world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);

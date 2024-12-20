@@ -1,0 +1,30 @@
+{
+    "blockhelp-berrybush-clip": "Cortar ramo",
+
+    "game:berrybush-too-cold": "Frio demais para florescer ou dar frutos",
+    "game:berrybush-too-hot": "Quente demais para florescer ou dar frutos",
+
+    "game:clipping-too-cold": "Frio demais para crescer",
+    "game:clipping-too-hot": "Quente demais para crescer",
+
+    "game:berrybush-shed-xdays": "Frutos frescos por aproximadamente {0} dias",
+    "game:berrybush-shed-1day": "Frutos frescos por menos de um dia",
+
+    "game:berrybush-sprouting-xdays": "Brotará um novo ramo em {0} dias",
+    "game:berrybush-sprouting-1day": "Brotará um novo ramo e menos de um dia",
+
+    "game:berrybush-clipping-growth-xdays": "Recuperará ramos podados em {0} dias",
+    "game:berrybush-clipping-growth-1day": "Recuperará ramos podados em menos de um dia",
+
+    "game:fruitingvine-sprouting-nosupport": "Não consegue crescer mais sem suporte adequado",
+
+    "game:placefailure-berrybushclipping": "Uma muda pode ser plantada no solo, ou enxertada no porta-enxerto apropriado",
+    "game:placefailure-berrybushclipping-vinemix": "Não é possível enxertar ramos de arbustos em vinhas",
+    "game:placefailure-berrybushclipping-nottallbush": "Este arbusto não é um porta-enxerto apropriado",
+    "game:placefailure-berrybushclipping-tootall": "Este arbusto é alto demais para enxertar",
+
+    "game:placefailure-fruitvineclipping": "Uma muda pode ser plantada no solo, ou enxertada no porta-enxerto apropriado",
+    "game:placefailure-fruitvineclipping-bushmix": "Não é possível enxertar vinhas em arbustos",
+    "game:placefailure-fruitvineclipping-nosupport": "Não é possível enxertar vinhas sem um suporte apropriado",
+    "game:placefailure-fruitvineclipping-tootall": "Esta vinha é longa demais para enxertar"
+}

@@ -1,4 +1,3 @@
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
@@ -14,31 +13,22 @@ namespace herbarium
         int kelpMinHeight = 5;
 
 
-
         public override void OnLoaded(ICoreAPI api)
         {
              base.OnLoaded(api);
 
-            maxDepth = this.Attributes["maxDepth"].AsInt();
-            minDepth = this.Attributes["minDepth"].AsInt();
-            waterCode = this.Attributes["waterCode"].AsString();
+            maxDepth = Attributes["maxDepth"].AsInt();
+            minDepth = Attributes["minDepth"].AsInt();
+            waterCode = Attributes["waterCode"].AsString();
 
         }
 
         public override bool CanPlantStay(IBlockAccessor blockAccessor, BlockPos pos)
         {
-            Block aboveBlock = blockAccessor.GetBlock(pos.UpCopy(), BlockLayersAccess.Fluid);
-            Block belowBlock = blockAccessor.GetBlock(pos.DownCopy(), BlockLayersAccess.Fluid);
+            Block aboveFluid = blockAccessor.GetBlock(pos.UpCopy(), BlockLayersAccess.Fluid);
+            Block belowFluid = blockAccessor.GetBlock(pos.DownCopy(), BlockLayersAccess.Fluid);
 
-            if(aboveBlock.LiquidCode != waterCode || aboveBlock is not GiantKelp)
-            {
-                return false;
-            }
-            if(belowBlock.LiquidCode != waterCode || belowBlock is not GiantKelp)
-            {
-                return false;
-            }
-
+            if(aboveFluid.LiquidCode != waterCode || aboveFluid is not GiantKelp || belowFluid.LiquidCode != waterCode || belowFluid is not GiantKelp) return false;
             return true;
         }
 
@@ -65,7 +55,7 @@ namespace herbarium
         */
 
         // Worldgen placement, tests to see how many blocks below water the plant is being placed, and if that's allowed for the plant
-        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, LCGRandom worldGenRand)
+        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldgenRandom, BlockPatchAttributes attributes = null)
         {
             Block block = blockAccessor.GetBlock(pos);
 
@@ -75,7 +65,7 @@ namespace herbarium
             }
 
             
-            Block belowBlock = blockAccessor.GetBlock(pos.X, pos.Y - 1, pos.Z);
+            Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
 
             if (belowBlock.Fertility > 0 && minDepth == 0)
             {
@@ -88,13 +78,12 @@ namespace herbarium
 
             if (belowBlock.LiquidCode == waterCode)
             {
-                if(belowBlock.LiquidCode != waterCode) return false;
                 for(var currentDepth = 1; currentDepth <= maxDepth + 1; currentDepth ++)
                 {
-                    belowBlock = blockAccessor.GetBlock(pos.X, pos.Y - currentDepth, pos.Z);
+                    belowBlock = blockAccessor.GetBlock(pos.DownCopy(currentDepth));
                     if (belowBlock.Fertility > 0)
                     {
-                        Block aboveBlock = blockAccessor.GetBlock(pos.X, pos.Y - currentDepth + 1, pos.Z);
+                        Block aboveBlock = blockAccessor.GetBlock(pos.DownCopy(currentDepth - 1));
                         if(aboveBlock.LiquidCode != waterCode) return false;
                         if(currentDepth < minDepth + 1) return false;
 
@@ -105,7 +94,7 @@ namespace herbarium
                         BlockPos kelpPos = pos.DownCopy(currentDepth - 1);
                         blockAccessor.SetBlock(baseBlock.BlockId, kelpPos);
 
-                        PlaceKelp(blockAccessor, kelpPos, worldGenRand, currentDepth);
+                        PlaceKelp(blockAccessor, kelpPos, worldgenRandom, currentDepth);
                         return true;
                     }
                 }
@@ -113,9 +102,9 @@ namespace herbarium
 
             return false;
         }
-        void PlaceKelp(IBlockAccessor blockAccessor, BlockPos pos, LCGRandom worldGenRand, int depth)
+        void PlaceKelp(IBlockAccessor blockAccessor, BlockPos pos, IRandom worldGenRand, int depth)
         {
-            Block aboveBlock = blockAccessor.GetBlock(pos.X, pos.Y + 1, pos.Z);
+            Block aboveBlock = blockAccessor.GetBlock(pos.UpCopy());
 
             Block middleBlock = blockAccessor.GetBlock(new AssetLocation(Attributes["middleBlock"].ToString()));
             Block topBlock = blockAccessor.GetBlock(new AssetLocation(Attributes["topBlock"].ToString()));
@@ -124,8 +113,8 @@ namespace herbarium
 
             for(var height = 1; height <= kelpHeight; height++)
             {
-                aboveBlock = blockAccessor.GetBlock(pos.X, pos.Y + height, pos.Z);
-                Block aboveAboveBlock = blockAccessor.GetBlock(pos.X, pos.Y + height + 1, pos.Z);
+                aboveBlock = blockAccessor.GetBlock(pos.UpCopy(height));
+                Block aboveAboveBlock = blockAccessor.GetBlock(pos.UpCopy(height + 1));
                 if(aboveAboveBlock.LiquidCode != waterCode || height == kelpHeight - 1)
                 {
                     blockAccessor.SetBlock(topBlock.BlockId, pos.UpCopy(height - 1));

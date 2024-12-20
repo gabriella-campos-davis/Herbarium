@@ -3,11 +3,12 @@
     "modid": "herbarium",
     "name": "Herbarium",
     "authors": [
-        "gabb", 
+        "gabb",
+        "pizza2004",
         "CATASTEROID"
     ],
-    "description": "a library of useful plant classes",
-    "version": "1.3.0",
+    "description": "A library of useful plant classes",
+    "version": "1.4.0",
     "dependencies": {
         "game": ""
     }
