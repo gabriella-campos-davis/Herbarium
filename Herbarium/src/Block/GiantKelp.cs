@@ -65,7 +65,7 @@ namespace herbarium
         */
 
         // Worldgen placement, tests to see how many blocks below water the plant is being placed, and if that's allowed for the plant
-        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, LCGRandom worldGenRand)
+        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldgenRandom, BlockPatchAttributes attributes = null)
         {
             Block block = blockAccessor.GetBlock(pos);
 
@@ -105,7 +105,7 @@ namespace herbarium
                         BlockPos kelpPos = pos.DownCopy(currentDepth - 1);
                         blockAccessor.SetBlock(baseBlock.BlockId, kelpPos);
 
-                        PlaceKelp(blockAccessor, kelpPos, worldGenRand, currentDepth);
+                        PlaceKelp(blockAccessor, kelpPos, worldgenRandom, currentDepth);
                         return true;
                     }
                 }
@@ -113,7 +113,7 @@ namespace herbarium
 
             return false;
         }
-        void PlaceKelp(IBlockAccessor blockAccessor, BlockPos pos, LCGRandom worldGenRand, int depth)
+        void PlaceKelp(IBlockAccessor blockAccessor, BlockPos pos, IRandom worldGenRand, int depth)
         {
             Block aboveBlock = blockAccessor.GetBlock(pos.X, pos.Y + 1, pos.Z);
 

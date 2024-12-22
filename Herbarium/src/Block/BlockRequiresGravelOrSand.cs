@@ -7,11 +7,11 @@ namespace herbarium
 {
     public class BlockRequiresGravelOrSand : Block
     {
-        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, LCGRandom worldGenRand)
+        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldgenRandom, BlockPatchAttributes attributes = null)
         {
             if (HasGravelOrSand(blockAccessor, pos))
             {
-                return base.TryPlaceBlockForWorldGen(blockAccessor, pos, onBlockFace, worldGenRand);
+                return base.TryPlaceBlockForWorldGen(blockAccessor, pos, onBlockFace, worldgenRandom);
             }
 
             return false;
