@@ -130,14 +130,14 @@ namespace herbarium
             base.OnNeighbourBlockChange(world, pos, neibpos);
         }
 
-        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, LCGRandom worldGenRand)
+        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldgenRandom, BlockPatchAttributes attributes = null)
         {
             // Don't spawn in 4 deep water
             if (blockAccessor.GetBlock(pos.X, pos.Y - growthDepth, pos.Z, BlockLayersAccess.Fluid).Id != 0) return false;
 
             //if()
 
-            return base.TryPlaceBlockForWorldGen(blockAccessor, pos, onBlockFace, worldGenRand);
+            return base.TryPlaceBlockForWorldGen(blockAccessor, pos, onBlockFace, worldgenRandom);
         }
 
         public override bool ShouldReceiveServerGameTicks(IWorldAccessor world, BlockPos pos, Random offThreadRandom, out object extra)

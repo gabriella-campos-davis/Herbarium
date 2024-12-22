@@ -152,7 +152,8 @@ namespace herbarium
                 mossGrowthChance = 0
             };
 
-            gen.GrowTree(Api.World.BulkBlockAccessor, Pos.DownCopy(), pa);
+            var worldgenRandom = new LCGRandom(Api.World.Seed);
+            gen.GrowTree(Api.World.BulkBlockAccessor, Pos.DownCopy(), pa, worldgenRandom);
 
             Api.World.BulkBlockAccessor.Commit();
         }
