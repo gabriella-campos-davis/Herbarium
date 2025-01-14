@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Vintagestory.API.Client;
-using Vintagestory.API.MathTools;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Util;
@@ -17,9 +14,7 @@ namespace herbarium
         WorldInteraction[] interactions;
         public override void OnLoaded(ICoreAPI api)
         {
-            if (api.Side != EnumAppSide.Client)
-                return;
-            ICoreClientAPI capi = api as ICoreClientAPI;
+            if (api.Side != EnumAppSide.Client) return;
 
             interactions = ObjectCacheUtil.GetOrCreate(api, "herbseedInteractions", () =>
             {
@@ -47,6 +42,7 @@ namespace herbarium
                 };
             });
         }
+
         public override void OnHeldInteractStart(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling)
         {
             if (blockSel == null || !byEntity.Controls.Sneak)
@@ -55,45 +51,36 @@ namespace herbarium
                 return;
             }
 
-            string berrytype = Variant["type"].ToString();
-            berryBlock = byEntity.Api.World.GetBlock(AssetLocation.Create("groundberryseedling-" + berrytype + "-planted", this.Code.Domain));
+            if (byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityFarmland) return;
 
-            BlockPos pos = blockSel.Position;
-            BlockEntity be = byEntity.World.BlockAccessor.GetBlockEntity(pos);
-            if (be is BlockEntityFarmland) return;
+            berryBlock = byEntity.Api.World.GetBlock(AssetLocation.Create("groundberryseedling-" + Variant["type"].ToString() + "-planted", Code.Domain));
+            IPlayer byPlayer = (byEntity is EntityPlayer) ? byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID) : null;
 
-            if (berryBlock != null)
+            blockSel = blockSel.Clone();
+            blockSel.Position.Up();
+
+            string failureCode = "";
+            if (!berryBlock?.TryPlaceBlock(api.World, byPlayer, itemslot.Itemstack, blockSel, ref failureCode) ?? true)
             {
-                IPlayer byPlayer = null;
-                if (byEntity is EntityPlayer)
-                    byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-
-                blockSel = blockSel.Clone();
-                blockSel.Position.Up();
-
-                string failureCode = "";
-                if (!berryBlock.TryPlaceBlock(api.World, byPlayer, itemslot.Itemstack, blockSel, ref failureCode))
+                if (api is ICoreClientAPI capi && failureCode != null && failureCode != "__ignore__")
                 {
-                    if (api is ICoreClientAPI capi && failureCode != null && failureCode != "__ignore__")
-                    {
-                        capi.TriggerIngameError(this, failureCode, Lang.Get("placefailure-" + failureCode));
-                    }
+                    capi.TriggerIngameError(this, failureCode, Lang.Get("placefailure-" + failureCode));
                 }
-                else
-                {
-                    byEntity.World.PlaySoundAt(new AssetLocation("sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
-
-                    ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
-
-                    if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
-                    {
-                        itemslot.TakeOut(1);
-                        itemslot.MarkDirty();
-                    }
-                }
-
-                handHandling = EnumHandHandling.PreventDefault;
             }
+            else
+            {
+                byEntity.World.PlaySoundAt(new AssetLocation("sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
+
+                ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+
+                if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
+                {
+                    itemslot.TakeOut(1);
+                    itemslot.MarkDirty();
+                }
+            }
+
+            handHandling = EnumHandHandling.PreventDefault;
         }
 
 

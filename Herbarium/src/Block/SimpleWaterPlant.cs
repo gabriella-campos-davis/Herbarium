@@ -15,19 +15,18 @@ namespace herbarium
         string waterCode;
 
 
-
         public override void OnLoaded(ICoreAPI api)
         {
              base.OnLoaded(api);
 
-            maxDepth = this.Attributes["maxDepth"].AsInt();
-            minDepth = this.Attributes["minDepth"].AsInt();
-            waterCode = this.Attributes["waterCode"].AsString();
+            maxDepth = Attributes["maxDepth"].AsInt();
+            minDepth = Attributes["minDepth"].AsInt();
+            waterCode = Attributes["waterCode"].AsString();
 
         }
 
         // Worldgen placement, tests to see how many blocks below water the plant is being placed, and if that's allowed for the plant
-        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, LCGRandom worldGenRand)
+        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldgenRandom, BlockPatchAttributes attributes = null)
         {
             Block block = blockAccessor.GetBlock(pos);
 
@@ -37,7 +36,7 @@ namespace herbarium
             }
 
             
-            Block belowBlock = blockAccessor.GetBlock(pos.X, pos.Y - 1, pos.Z);
+            Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
 
             if (belowBlock.Fertility > 0 && minDepth == 0)
             {
@@ -50,13 +49,12 @@ namespace herbarium
 
             if (belowBlock.LiquidCode == waterCode)
             {
-                if(belowBlock.LiquidCode != waterCode) return false;
                 for(var currentDepth = 1; currentDepth <= maxDepth + 1; currentDepth ++)
                 {
-                    belowBlock = blockAccessor.GetBlock(pos.X, pos.Y - currentDepth, pos.Z);
+                    belowBlock = blockAccessor.GetBlock(pos.DownCopy(currentDepth));
                     if (belowBlock.Fertility > 0)
                     {
-                        Block aboveBlock = blockAccessor.GetBlock(pos.X, pos.Y - currentDepth + 1, pos.Z);
+                        Block aboveBlock = blockAccessor.GetBlock(pos.DownCopy(currentDepth - 1));
                         if(aboveBlock.LiquidCode != waterCode) return false;
                         if(currentDepth < minDepth + 1) return false;
 

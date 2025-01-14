@@ -1,0 +1,30 @@
+{
+  "blockhelp-berrybush-clip": "Zweig abschneiden",
+
+  "game:berrybush-too-cold": "Zu kalt zum Blühen oder zur Fruchtbildung",
+  "game:berrybush-too-hot": "Zu heiß zum Blühen oder zur Fruchtbildung",
+
+  "game:clipping-too-cold": "Zu kalt zum Wachsen",
+  "game:clipping-too-hot": "Zu heiß zum Wachsen",
+
+  "game:berrybush-shed-xdays": "Frische Beeren für etwa {0} Tage",
+  "game:berrybush-shed-1day": "Frische Beeren für weniger als einen Tag",
+
+  "game:berrybush-sprouting-xdays": "Wird in {0} Tagen neue Triebe ausbilden",
+  "game:berrybush-sprouting-1day": "Wird in weniger als einem Tag neue Triebe ausbilden",
+
+  "game:berrybush-clipping-growth-xdays": "Beschnittene Zweige werden in {0} Tagen nachwachsen",
+  "game:berrybush-clipping-growth-1day": "Beschnittene Zweige werden in weniger als einem Tag nachwachsen",
+
+  "game:fruitingvine-sprouting-nosupport": "Kann ohne richtige Unterstützung nicht höher wachsen",
+
+  "game:placefailure-berrybushclipping": "Ein Steckling muss in Erde gepflanzt oder auf einen geeigneten Stamm veredelt werden",
+  "game:placefailure-berrybushclipping-vinemix": "Buschstecklinge können nicht auf Reben veredelt werden",
+  "game:placefailure-berrybushclipping-nottallbush": "Dieser Busch ist kein geeigneter Stamm",
+  "game:placefailure-berrybushclipping-tootall": "Dieser Busch ist zu hoch zum Veredeln",
+
+  "game:placefailure-fruitvineclipping": "Ein Steckling muss in Erde gepflanzt oder auf einen geeigneten Stamm veredelt werden",
+  "game:placefailure-fruitvineclipping-bushmix": "Rebenstecklinge können nicht auf Büsche veredelt werden",
+  "game:placefailure-fruitvineclipping-nosupport": "Kann keine Rebenstecklinge ohne richtige Unterstützung veredeln",
+  "game:placefailure-fruitvineclipping-tootall": "Diese Rebe ist zu lang zum Veredeln"
+}

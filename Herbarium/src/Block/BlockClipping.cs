@@ -6,32 +6,43 @@ namespace herbarium
 {
     public class BlockClipping : BlockPlant
     {
-        public override void OnLoaded(ICoreAPI api)
+        public override bool TryPlaceBlock(IWorldAccessor world, IPlayer byPlayer, ItemStack itemstack, BlockSelection blockSel, ref string failureCode)
         {
-            base.OnLoaded(api);
+            if (CanPlaceClipping(world.BlockAccessor, blockSel.Position, ref failureCode))
+            {
+                if (CanPlaceBlock(world, byPlayer, blockSel, ref failureCode))
+                {
+                    return DoPlaceBlock(world, byPlayer, blockSel, itemstack);
+                }
+            }
+
+            return false;
+        }
+
+        public virtual bool CanPlaceClipping(IBlockAccessor blockAccessor, BlockPos pos, ref string failureCode)
+        {
+            string failureCodeOld = failureCode;
+            Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
+
+            if (belowBlock is BlockFruitingVines || belowBlock is BlockTreeVine) failureCode = "berrybushclipping-vinemix";
+            else if (belowBlock is HerbariumBerryBush)
+            {
+                Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
+                bool isLarge = (belowBlock.Attributes?["isLarge"].AsBool() ?? false) && (belowBelowBlock.Attributes?["isBottomBlock"].AsBool() ?? false);
+
+                if (blockAccessor.GetBlockEntity(pos.DownCopy()) is not BETallBerryBush) failureCode = "berrybushclipping-nottallbush";
+                else if (belowBelowBlock.Fertility <= 0 && !isLarge) failureCode = "berrybushclipping-tootall";
+            }
+            else if (belowBlock.Fertility <= 0) failureCode = "berrybushclipping";
+
+            return failureCode == failureCodeOld;
         }
 
         public override bool CanPlantStay(IBlockAccessor blockAccessor, BlockPos pos)
         {
-            Block belowBlock = blockAccessor.GetBlock(pos.DownCopy());
-            BlockEntity belowBlockEntity = blockAccessor.GetBlockEntity(pos.DownCopy());
+            string failureCode = "";
 
-            Block belowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(2));
-
-            Block belowBelowBelowBlock = blockAccessor.GetBlock(pos.DownCopy(3));
-
-            if (belowBlock is HerbariumBerryBush || belowBlock is PricklyBerryBush)
-            {
-                if(belowBlockEntity is BETallBerryBush)
-                {
-                    if(belowBlock.Attributes["isLarge"].AsBool())
-                    {
-                        if(belowBelowBelowBlock.Fertility > 0) return true;
-                    }
-                    if(belowBelowBlock.Fertility > 0) return true;
-                }
-            }
-            return belowBlock.Fertility > 0;
+            return CanPlaceClipping(blockAccessor, pos, ref failureCode);
         }
     }
 }

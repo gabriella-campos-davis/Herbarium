@@ -1,16 +1,15 @@
 ﻿using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using Vintagestory.API.Client;
-using Vintagestory.API.MathTools;
 using herbarium.config;
 using BuffStuff;
 using Vintagestory.GameContent;
 
 
 [assembly: ModInfo( "Herbarium Plant Library",
-	Description = "Adds implements various useful classes related to plants for other mods to use",
+	Description = "Implements various useful classes related to plants for other mods to use",
 	Website     = "",
-	Authors     = new []{ "gabb", "CATASTEROID" } )]
+	Authors     = new []{ "gabb", "pizza2004", "CATASTEROID" } )]
 
 namespace herbarium
 {
@@ -21,10 +20,6 @@ namespace herbarium
         {
             return true;
         }
-       public override void AssetsLoaded(ICoreAPI api)
-		{
-			base.AssetsLoaded(api);
-		}
 
         #region Client
         public override void StartClientSide(ICoreClientAPI capi)
@@ -48,12 +43,15 @@ namespace herbarium
             base.Start(api);
             networkHandler = new NetworkHandler();
 
-            //Api = api;
             api.RegisterBlockClass("HerbariumBerryBush", typeof(HerbariumBerryBush));
             api.RegisterBlockClass("PricklyBerryBush", typeof(PricklyBerryBush));
-            api.RegisterBlockClass("ShrubBerryBush", typeof(ShrubBerryBush));
+            api.RegisterBlockClass("ShrubBerryBush", typeof(HerbariumBerryBush));
             api.RegisterBlockClass("GroundBerryPlant", typeof(GroundBerryPlant));
             api.RegisterBlockClass("BlockClipping", typeof(BlockClipping));
+
+            api.RegisterBlockClass("BlockVineClipping", typeof(BlockVineClipping));
+            api.RegisterBlockClass("BlockFruitingVines", typeof(BlockFruitingVines));
+            api.RegisterBlockClass("BlockTreeVine", typeof(BlockTreeVine));
 
             api.RegisterBlockClass("StoneBerryPlant", typeof(StoneBerryPlant));
             api.RegisterBlockClass("StonePlant", typeof(StonePlant));
@@ -72,18 +70,22 @@ namespace herbarium
 
             api.RegisterBlockClass("GiantKelp", typeof(GiantKelp));
 
-            api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestMultiple));
+            api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestable));
            
             api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
-            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEShrubBerryBush));
+            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEHerbariumBerryBush));
             api.RegisterBlockEntityClass("BETallBerryBush", typeof(BETallBerryBush));
             api.RegisterBlockEntityClass("BEClipping", typeof(BEClipping));
             api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
-            api.RegisterBlockEntityClass("BESeedling", typeof(BESeedling));
+            api.RegisterBlockEntityClass("BESeedling", typeof(BEClipping));
+            api.RegisterBlockEntityClass("MelonVine", typeof(BlockEntityMelonVine));
 
-            api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BEHerbariumSapling));
+            api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BlockEntitySapling));
 
             api.RegisterBlockEntityClass("BEDuckWeedRoot", typeof(BEDuckWeedRoot));
+
+            api.RegisterBlockEntityBehaviorClass("RootSuckers", typeof(BEBehaviorRootSuckers));
+            api.RegisterCropBehavior("Melon", typeof(MelonCropBehavior));
 
             api.RegisterItemClass("ItemClipping", typeof(ItemClipping));
             api.RegisterItemClass("ItemBerrySeed", typeof(ItemBerrySeed));
