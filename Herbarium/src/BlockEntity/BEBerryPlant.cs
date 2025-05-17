@@ -94,8 +94,10 @@ namespace herbarium
         {
             bool preventDefault = false;
             float result = 0;
-            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            foreach (var b in Behaviors)
             {
+                if (b is not BEBehaviorBerryPlant behavior) continue;
+
                 float bhresult;
 
                 EnumHandling handled = EnumHandling.PassThrough;
@@ -117,8 +119,10 @@ namespace herbarium
         {
             bool preventDefault = false;
 
-            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            foreach (var b in Behaviors)
             {
+                if (b is not BEBehaviorBerryPlant behavior) continue;
+
                 EnumHandling handled = EnumHandling.PassThrough;
                 behavior.OnGrowth(lastCheck, ref handled);
                 if (handled != EnumHandling.PassThrough)
@@ -192,8 +196,10 @@ namespace herbarium
         {
             bool preventDefault = false;
             bool result = false;
-            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            foreach (var b in Behaviors)
             {
+                if (b is not BEBehaviorBerryPlant behavior) continue;
+
                 bool bhresult;
 
                 EnumHandling handled = EnumHandling.PassThrough;
@@ -258,8 +264,9 @@ namespace herbarium
         {
             bool preventDefault = false;
 
-            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            foreach (var b in Behaviors)
             {
+                if (b is not BEBehaviorBerryPlant behavior) continue;
                 EnumHandling handled = EnumHandling.PassThrough;
                 behavior.UpdateHoursLeft(intervalHours, ref intervalDays, ref daysToCheck, ref handled);
                 if (handled != EnumHandling.PassThrough)
@@ -282,8 +289,10 @@ namespace herbarium
         {
             bool preventDefault = false;
             bool result = false;
-            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            foreach (var b in Behaviors)
             {
+                if (b is not BEBehaviorBerryPlant behavior) continue;
+
                 bool bhresult;
 
                 EnumHandling handled = EnumHandling.PassThrough;
@@ -307,8 +316,10 @@ namespace herbarium
         {
             bool preventDefault = false;
             bool result = false;
-            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            foreach (var b in Behaviors)
             {
+                if (b is not BEBehaviorBerryPlant behavior) continue;
+
                 bool bhresult;
 
                 EnumHandling handled = EnumHandling.PassThrough;
@@ -332,8 +343,10 @@ namespace herbarium
         {
             bool preventDefault = false;
             bool result = false;
-            foreach (BEBehaviorBerryPlant behavior in Behaviors)
+            foreach (var b in Behaviors)
             {
+                if (b is not BEBehaviorBerryPlant behavior) continue;
+                
                 bool bhresult;
 
                 EnumHandling handled = EnumHandling.PassThrough;
