@@ -1,4 +1,6 @@
-﻿using Vintagestory.API.Common;
+﻿using System;
+using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
@@ -17,13 +19,14 @@ namespace herbarium
         //Probability of vine growth once the minimum vine growth stage is reached
         private float vineGrowthQuantity;
 
-        private AssetLocation vineBlockLocation;
-        NatFloat vineGrowthQuantityGen;
-        string melonBlockCode;
-        string domainCode;
+        private AssetLocation vineBlockLocation = null!;
+        NatFloat vineGrowthQuantityGen = NatFloat.Zero;
+        string melonBlockCode = null!;
+        string domainCode = GlobalConstants.DefaultDomain;
 
         public MelonCropBehavior(Block block) : base(block)
         {
+
         }
 
         public override void Initialize(JsonObject properties)
@@ -34,12 +37,18 @@ namespace herbarium
             vineWitherStage = properties["vineWitherStage"].AsInt(8);
             vineGrowthQuantityGen = properties["vineGrowthQuantity"].AsObject<NatFloat>();
             melonBlockCode = properties["melonBlockCode"].AsString();
-            domainCode = properties["domainCode"].AsString("game");
+            domainCode = properties["domainCode"].AsString(block.Code.Domain);
 
             vineBlockLocation = new AssetLocation(domainCode + ":" + melonBlockCode + "-vine-1-normal");
+
+            if (vineGrowthQuantityGen == null || melonBlockCode == null)
+            {
+                throw new Exception($"{block.Code.ToString()} does not properly define the properties, vineGrowthQuantity: {vineGrowthQuantityGen}, melonBlockCode: {melonBlockCode}");
+            }
+            else if (vineBlockLocation == null) throw new Exception($"{block.Code.ToString()} could not define vineBlockLocation: {vineBlockLocation}");
         }
 
-        public override void OnPlanted(ICoreAPI api)
+        public override void OnPlanted(ICoreAPI api, ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel)
         {
             vineGrowthQuantity = vineGrowthQuantityGen.nextFloat(1, api.World.Rand);
         }

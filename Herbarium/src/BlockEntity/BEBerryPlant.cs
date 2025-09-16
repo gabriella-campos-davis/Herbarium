@@ -24,7 +24,7 @@ namespace herbarium
         public double lastCheckAtTotalDays = 0;
         protected double transitionHoursLeft = -1;
 
-        protected RoomRegistry roomreg;
+        protected RoomRegistry? roomreg;
         public int roomness;
 
         protected float resetBelowTemp = 0;
@@ -37,9 +37,9 @@ namespace herbarium
 
         public EnumHBBTemp TemperatureState { get { return temperatureState; } }
 
-        public float growthRateMul = HerbariumConfig.Current.berryGrowthRateMul.Value;
-        public bool growByMonth = HerbariumConfig.Current.berriesGrowByMonth.Value;
-        protected bool simplifiedTooltips = HerbariumConfig.Current.simplifiedBerryTooltips.Value;
+        public float growthRateMul = HerbariumConfig.Current.berryGrowthRateMul!.Value;
+        public bool growByMonth = HerbariumConfig.Current.berriesGrowByMonth!.Value;
+        protected bool simplifiedTooltips = HerbariumConfig.Current.simplifiedBerryTooltips!.Value;
 
         public BEBerryPlant() : base()
         {
@@ -69,7 +69,7 @@ namespace herbarium
 
                 roomreg = api.ModLoader.GetModSystem<RoomRegistry>();
 
-                ClimateCondition conds = null;
+                ClimateCondition? conds = null;
                 float baseTemperature = 0;
 
                 temperatureState = CheckTemperature(TemperatureAtDate(Api.World.Calendar.TotalDays, ref conds, ref baseTemperature));
@@ -138,9 +138,9 @@ namespace herbarium
 
         protected virtual void CheckGrow(float dt)
         {
-            if (!(Api as ICoreServerAPI).World.IsFullyLoadedChunk(Pos)) return;
+            if ((Api as ICoreServerAPI)?.World.IsFullyLoadedChunk(Pos) != true) return;
 
-            if (Block.EntityClass == null)
+            if (Block?.EntityClass == null)
             {
                 Api.World.BlockAccessor.RemoveBlockEntity(Pos);
                 return;
@@ -156,7 +156,7 @@ namespace herbarium
 
             if (Api.World.BlockAccessor.GetRainMapHeightAt(Pos) > Pos.Y) // Fast pre-check
             {
-                Room room = roomreg?.GetRoomForPosition(Pos);
+                Room? room = roomreg?.GetRoomForPosition(Pos);
                 roomness = (room != null && room.SkylightCount > room.NonSkylightCount && room.ExitCount == 0) ? 1 : 0;
             }
             else
@@ -164,7 +164,7 @@ namespace herbarium
                 roomness = 0;
             }
 
-            ClimateCondition conds = null;
+            ClimateCondition? conds = null;
             float baseTemperature = 0;
             while (daysToCheck > intervalDays)
             {
@@ -219,7 +219,7 @@ namespace herbarium
             return growByMonth ? hours / 9 * Api.World.Calendar.DaysPerMonth : hours;
         }
 
-        public virtual float TemperatureAtDate(double date, ref ClimateCondition conds, ref float baseTemperature)
+        public virtual float TemperatureAtDate(double date, ref ClimateCondition? conds, ref float baseTemperature)
         {
             if (conds == null)
             {

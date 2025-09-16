@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -11,24 +12,15 @@ namespace herbarium
 {
     public class ItemHerbSeed : Item
     {        
-        WorldInteraction[] interactions;
+        WorldInteraction[] interactions = null!;
         public override void OnLoaded(ICoreAPI api)
         {
             if (api.Side != EnumAppSide.Client) return;
 
             interactions = ObjectCacheUtil.GetOrCreate(api, "herbseedInteractions", () =>
             {
-                List<ItemStack> stacks = new List<ItemStack>();
-
-                foreach (Block block in api.World.Blocks)
-                {
-                    if (block.Code == null || block.EntityClass == null)
-                        continue;
-                    if (block.Fertility > 0)
-                    {
-                        stacks.Add(new ItemStack(block));
-                    }
-                }
+                ItemStack[] stacks = [.. api.World.Blocks.Where(block => block.Code != null && block.EntityClass != null && block.Fertility > 0)
+                                             .Select(block => new ItemStack(block))];
 
                 return new WorldInteraction[]
                 {
@@ -37,7 +29,7 @@ namespace herbarium
                         ActionLangCode = "heldhelp-plant",
                         MouseButton = EnumMouseButton.Right,
                         HotKeyCode = "sneak",
-                        Itemstacks = stacks.ToArray()
+                        Itemstacks = stacks
                     }
                 };
             });
@@ -47,7 +39,7 @@ namespace herbarium
         {
             if (blockSel == null) return;
 
-            IPlayer byPlayer = (byEntity is EntityPlayer) ? byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID) : null;
+            IPlayer? byPlayer = byEntity.World.PlayerByUid((byEntity as EntityPlayer)?.PlayerUID);
 
             if (api.World.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityFarmland)
             {
@@ -56,7 +48,7 @@ namespace herbarium
                 Block cropBlock = byEntity.World.GetBlock(CodeWithPath("crop-" + itemslot.Itemstack.Collectible.LastCodePart() + "-1"));
                 if (cropBlock == null) return;
 
-                if (((BlockEntityFarmland)api.World.BlockAccessor.GetBlockEntity(blockSel.Position)).TryPlant(cropBlock))
+                if (((BlockEntityFarmland)api.World.BlockAccessor.GetBlockEntity(blockSel.Position)).TryPlant(cropBlock, itemslot, byEntity, blockSel))
                 {
                     byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
 

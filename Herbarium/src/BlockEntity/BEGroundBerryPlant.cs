@@ -11,7 +11,7 @@ namespace herbarium
 {
     public class BEGroundBerryPlant : BEBerryPlant, IAnimalFoodSource
     {
-        public string[] creatureDietFoodTags;
+        public string[] creatureDietFoodTags = [];
         public BEGroundBerryPlant() : base()
         {
 
@@ -23,7 +23,7 @@ namespace herbarium
 
             if (api is ICoreServerAPI)
             {
-                creatureDietFoodTags = Block.Attributes["foodTags"].AsArray<string>();
+                creatureDietFoodTags = Block.Attributes["foodTags"].AsArray<string>([]);
 
                 api.ModLoader.GetModSystem<POIRegistry>().AddPOI(this);
             }
@@ -150,6 +150,12 @@ namespace herbarium
 
         public float ConsumeOnePortion(Entity entity)
         {
+            if (Block?.EntityClass == null)
+            {
+                Api.World.BlockAccessor.RemoveBlockEntity(Pos);
+                return 0f;
+            }
+
             AssetLocation loc = Block.CodeWithVariant("state", "empty");
             if (!loc.Valid)
             {
@@ -162,7 +168,7 @@ namespace herbarium
 
             var bbh = Block.GetCollectibleBehavior<BlockBehaviorHarvestable>(true);
             bbh?.harvestedStacks?.Foreach(harvestedStack => { Api.World.SpawnItemEntity(harvestedStack?.GetNextItemStack(), Pos); });
-            Api.World.PlaySoundAt(bbh.harvestingSound, Pos, 0);
+            Api.World.PlaySoundAt(bbh?.harvestingSound, Pos, 0);
 
             Api.World.BlockAccessor.ExchangeBlock(nextBlock.BlockId, Pos);
             MarkDirty(true);

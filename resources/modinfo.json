@@ -8,7 +8,7 @@
         "CATASTEROID"
     ],
     "description": "A library of useful plant classes",
-    "version": "1.4.0",
+    "version": "1.4.1-rc.1",
     "dependencies": {
         "game": ""
     }

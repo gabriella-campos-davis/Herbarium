@@ -9,14 +9,14 @@ namespace herbarium.config
         public bool? plantsCanPoison = true;
         public float? plantsDamage = 0.5f;
         public float? plantsDamageTick = 0.7f;
-        public string[] plantsWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
+        public string[] plantsWillDamage = ["game:wolf", "game:bear", "game:drifter", "game:player"];
 
         public bool? poulticeHealOverTime = true;
 
         public bool? berryBushCanDamage = true;
         public float? berryBushDamage = 0.5f;
         public float? berryBushDamageTick = 0.7f;
-        public string[] berryBushWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:player"};
+        public string[] berryBushWillDamage = ["game:wolf", "game:bear", "game:drifter", "game:player"];
         public float? berryGrowthRateMul = 1f;
         public bool? berriesGrowByMonth = false;
         public bool? useKnifeForClipping = true;
@@ -26,7 +26,7 @@ namespace herbarium.config
         public HerbariumConfig()
         {}
 
-        public static HerbariumConfig Current { get; set; }
+        public static HerbariumConfig Current { get; set; } = null!;
 
         public static HerbariumConfig GetDefault()
         {
@@ -36,14 +36,14 @@ namespace herbarium.config
             defaultConfig.plantsCanPoison = true;
             defaultConfig.plantsDamage = 0.5f;
             defaultConfig.plantsDamageTick = 0.7f;
-            defaultConfig.plantsWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:bowtorn", "game:shiver", "game:player"};
+            defaultConfig.plantsWillDamage = ["game:wolf", "game:bear", "game:drifter", "game:bowtorn", "game:shiver", "game:player"];
 
             defaultConfig.poulticeHealOverTime = true;
 
             defaultConfig.berryBushCanDamage = true;
             defaultConfig.berryBushDamage = 0.5f;
             defaultConfig.berryBushDamageTick = 0.7f;
-            defaultConfig.berryBushWillDamage = new string[]{"game:wolf", "game:bear", "game:drifter", "game:bowtorn", "game:shiver", "game:player" };
+            defaultConfig.berryBushWillDamage = ["game:wolf", "game:bear", "game:drifter", "game:bowtorn", "game:shiver", "game:player"];
             defaultConfig.berryGrowthRateMul = 1f;
             defaultConfig.berriesGrowByMonth = false;
             defaultConfig.useKnifeForClipping = true;

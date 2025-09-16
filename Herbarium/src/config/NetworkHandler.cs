@@ -16,8 +16,8 @@ namespace herbarium.config
         }
 
         #region Client
-        IClientNetworkChannel clientChannel;
-        ICoreClientAPI clientApi;
+        IClientNetworkChannel clientChannel = null!;
+        ICoreClientAPI clientApi = null!;
         public void InitializeClientSideNetworkHandler(ICoreClientAPI capi)
         {
             clientApi = capi;
@@ -51,8 +51,8 @@ namespace herbarium.config
         #endregion
 
         #region server
-        IServerNetworkChannel serverChannel;
-        ICoreServerAPI serverApi;
+        IServerNetworkChannel serverChannel = null!;
+        ICoreServerAPI serverApi = null!;
         public void InitializeServerSideNetworkHandler(ICoreServerAPI api)
         {
             serverApi = api;
@@ -105,7 +105,7 @@ namespace herbarium.config
         class OnPlayerLoginMessage
         {
             [ProtoMember(1)]
-            IPlayer[] fromPlayer;
+            IPlayer[] fromPlayer = null!;
         }
     }
 }
