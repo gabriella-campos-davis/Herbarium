@@ -93,7 +93,7 @@ namespace herbarium
             //Tree
             api.RegisterItemClass("ItemWildShield", typeof(ItemWildShield));
             api.RegisterBlockClass("BlockPricklyLeaves", typeof(BlockPricklyLeaves));
-
+            
 
             networkHandler.RegisterMessages(api);
             HerbariumConfig.createConfig(api);
