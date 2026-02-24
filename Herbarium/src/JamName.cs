@@ -4,13 +4,13 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
-using Vintagestory.ServerMods;
+
 
 public class JamRecipeName : ICookingRecipeNamingHelper
 {
     public string GetNameForIngredients(IWorldAccessor worldForResolve, string recipeCode, ItemStack[] stacks)
     {
-        OrderedDictionary<ItemStack, int> quantitiesByStack = new OrderedDictionary<ItemStack, int>();
+        Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> quantitiesByStack = new Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int>();
         quantitiesByStack = mergeStacks(worldForResolve, stacks);
 
         CookingRecipe recipe = worldForResolve.Api.GetCookingRecipe(recipeCode);
@@ -48,9 +48,9 @@ public class JamRecipeName : ICookingRecipeNamingHelper
         else return Lang.Get("unknown");
     }
 
-    private OrderedDictionary<ItemStack, int> mergeStacks(IWorldAccessor worldForResolve, ItemStack[] stacks)
+    private Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> mergeStacks(IWorldAccessor worldForResolve, ItemStack[] stacks)
     {
-        OrderedDictionary<ItemStack, int> dict = new OrderedDictionary<ItemStack, int>();
+        Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> dict = new Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int>();
 
         List<ItemStack> stackslist = new List<ItemStack>(stacks);
         while (stackslist.Count > 0)

@@ -1,18 +1,16 @@
-using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
-using Vintagestory.API.Datastructures;
-using Vintagestory.API.MathTools;
-using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
 namespace herbarium
 {
     //this class just makes it so some specific shields from wildcrafttrees can have correct names
-    public class ItemWildShield : ItemShield
+    public class ItemWildShield : ItemShieldFromAttributes
     {
         float offY;
         float curOffY = 0;
@@ -23,6 +21,9 @@ namespace herbarium
 
         Dictionary<string, Dictionary<string, int>> durabilityGains;
 
+        private static readonly MethodInfo addAllTypesMethod = typeof(ItemShieldFromAttributes).GetMethod("AddAllTypesToCreativeInventory", BindingFlags.Instance | BindingFlags.NonPublic);
+
+
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
@@ -32,7 +33,7 @@ namespace herbarium
 
             durabilityGains = Attributes["durabilityGains"].AsObject<Dictionary<string, Dictionary<string, int>>>();
 
-            AddAllTypesToCreativeInventory();
+            addAllTypesMethod?.Invoke(this, null);
         }
 
          
@@ -75,5 +76,9 @@ namespace herbarium
 
             return base.GetHeldItemName(itemStack);
         }
+
+
+
+
     }
 }
