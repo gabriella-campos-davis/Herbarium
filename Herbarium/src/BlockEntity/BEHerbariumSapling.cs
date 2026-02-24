@@ -151,7 +151,6 @@ namespace herbarium
                 vinesGrowthChance = 0,
                 mossGrowthChance = 0
             };
-
             gen.GrowTree(Api.World.BulkBlockAccessor, Pos.DownCopy(), pa);
 
             Api.World.BulkBlockAccessor.Commit();
