@@ -5,11 +5,12 @@
     "authors": [
         "gabb",
         "pizza2004",
+        "Captanredbeard",
         "CATASTEROID"
     ],
     "description": "A library of useful plant classes",
-    "version": "1.4.1-rc.1",
+    "version": "1.4.1-rc.2",
     "dependencies": {
-        "game": ""
+        "game": "1.22.0-pre.3"
     }
 }

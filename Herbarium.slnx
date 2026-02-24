@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CakeBuild/CakeBuild.csproj" />
+  <Project Path="Herbarium/Herbarium.csproj" />
+</Solution>

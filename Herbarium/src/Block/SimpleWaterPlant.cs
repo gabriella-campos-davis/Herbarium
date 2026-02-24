@@ -19,14 +19,14 @@ namespace herbarium
         {
              base.OnLoaded(api);
 
-            maxDepth = Attributes["maxDepth"].AsInt();
-            minDepth = Attributes["minDepth"].AsInt();
-            waterCode = Attributes["waterCode"].AsString();
+            maxDepth = this.Attributes["maxDepth"].AsInt();
+            minDepth = this.Attributes["minDepth"].AsInt();
+            waterCode = this.Attributes["waterCode"].AsString();
 
         }
 
         // Worldgen placement, tests to see how many blocks below water the plant is being placed, and if that's allowed for the plant
-        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldgenRandom, BlockPatchAttributes attributes = null)
+        public override bool TryPlaceBlockForWorldGen(IBlockAccessor blockAccessor, BlockPos pos, BlockFacing onBlockFace, IRandom worldGenRand, BlockPatchAttributes attributes = null)
         {
             Block block = blockAccessor.GetBlock(pos);
 

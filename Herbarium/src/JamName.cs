@@ -5,14 +5,13 @@ using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
 
-namespace herbarium
+
+public class JamRecipeName : ICookingRecipeNamingHelper
 {
-    public class JamRecipeName : ICookingRecipeNamingHelper
+    public string GetNameForIngredients(IWorldAccessor worldForResolve, string recipeCode, ItemStack[] stacks)
     {
-        public string GetNameForIngredients(IWorldAccessor worldForResolve, string recipeCode, ItemStack[] stacks)
-        {
-            OrderedDictionary<ItemStack, int> quantitiesByStack = new OrderedDictionary<ItemStack, int>();
-            quantitiesByStack = mergeStacks(worldForResolve, stacks);
+        Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> quantitiesByStack = new Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int>();
+        quantitiesByStack = mergeStacks(worldForResolve, stacks);
 
             CookingRecipe recipe = worldForResolve.Api.GetCookingRecipe(recipeCode);
 
@@ -49,9 +48,9 @@ namespace herbarium
             else return Lang.Get("unknown");
         }
 
-        private OrderedDictionary<ItemStack, int> mergeStacks(IWorldAccessor worldForResolve, ItemStack[] stacks)
-        {
-            OrderedDictionary<ItemStack, int> dict = new OrderedDictionary<ItemStack, int>();
+    private Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> mergeStacks(IWorldAccessor worldForResolve, ItemStack[] stacks)
+    {
+        Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> dict = new Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int>();
 
             List<ItemStack> stackslist = new List<ItemStack>(stacks);
             while (stackslist.Count > 0)
@@ -81,5 +80,4 @@ namespace herbarium
 
             return dict;
         }
-    }
 }
