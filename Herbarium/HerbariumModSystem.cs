@@ -48,51 +48,53 @@ namespace herbarium
             base.Start(api);
             networkHandler = new NetworkHandler();
 
-            //Api = api;
-            api.RegisterBlockClass("HerbariumBerryBush", typeof(HerbariumBerryBush));
-            api.RegisterBlockClass("PricklyBerryBush", typeof(PricklyBerryBush));
-            api.RegisterBlockClass("ShrubBerryBush", typeof(ShrubBerryBush));
-            api.RegisterBlockClass("GroundBerryPlant", typeof(GroundBerryPlant));
-            api.RegisterBlockClass("BlockClipping", typeof(BlockClipping));
+            //UNUSED
+            /*
+            api.RegisterBlockClass("GiantKelp", typeof(GiantKelp));
+            api.RegisterBlockClass("DuckWeed", typeof(DuckWeed));
+            api.RegisterBlockClass("DuckWeedRoot", typeof(DuckWeedRoot));  
+            api.RegisterBlockClass("BlockRequiresGravelOrSand", typeof(BlockRequiresGravelOrSand));
+            api.RegisterBlockClass("BlockLeavesDropCanes", typeof(BlockLeavesDropCanes));
+            api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));         
+            api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BEHerbariumSapling));
+            api.RegisterBlockEntityClass("BEDuckWeedRoot", typeof(BEDuckWeedRoot));
+            */
 
+            //Fruits and Berries
+            api.RegisterBlockClass("GroundBerryPlant", typeof(GroundBerryPlant));
+            api.RegisterBlockClass("ShrubBerryBush", typeof(ShrubBerryBush));
+            api.RegisterBlockClass("PricklyBerryBush", typeof(PricklyBerryBush));
+            api.RegisterBlockClass("BlockClipping", typeof(BlockClipping));
+            api.RegisterBlockClass("HerbariumBerryBush", typeof(HerbariumBerryBush));
             api.RegisterBlockClass("StoneBerryPlant", typeof(StoneBerryPlant));
             api.RegisterBlockClass("StonePlant", typeof(StonePlant));
+            
+            api.RegisterItemClass("ItemBerrySeed", typeof(ItemBerrySeed));
+            api.RegisterItemClass("ItemClipping", typeof(ItemClipping));
 
+            api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestMultiple));
+            
+            api.RegisterBlockEntityClass("BEClipping", typeof(BEClipping));
+            api.RegisterBlockEntityClass("BETallBerryBush", typeof(BETallBerryBush));
+            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEShrubBerryBush));
+            api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
+            api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
+
+            //Herbs
             api.RegisterBlockClass("HerbPlant", typeof(HerbPlant));
             api.RegisterBlockClass("WaterHerb", typeof(WaterHerb));
             api.RegisterBlockClass("SimpleWaterPlant", typeof(SimpleWaterPlant));
 
-            api.RegisterBlockClass("DuckWeed", typeof(DuckWeed));
-            api.RegisterBlockClass("DuckWeedRoot", typeof(DuckWeedRoot));
-
-            api.RegisterBlockClass("BlockRequiresGravelOrSand", typeof(BlockRequiresGravelOrSand));
-
-            api.RegisterBlockClass("BlockPricklyLeaves", typeof(BlockPricklyLeaves));
-            api.RegisterBlockClass("BlockLeavesDropCanes", typeof(BlockLeavesDropCanes));
-
-            api.RegisterBlockClass("GiantKelp", typeof(GiantKelp));
-
-            api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestMultiple));
-           
-            api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
-            api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEShrubBerryBush));
-            api.RegisterBlockEntityClass("BETallBerryBush", typeof(BETallBerryBush));
-            api.RegisterBlockEntityClass("BEClipping", typeof(BEClipping));
-            api.RegisterBlockEntityClass("BEGroundBerryPlant", typeof(BEGroundBerryPlant));
+            api.RegisterItemClass("HerbariumPoultice", typeof(HerbariumPoultice));
+            api.RegisterItemClass("ItemHerbSeed", typeof(ItemHerbSeed));
             api.RegisterBlockEntityClass("BESeedling", typeof(BESeedling));
 
-            api.RegisterBlockEntityClass("BEHerbariumSapling", typeof(BEHerbariumSapling));
 
-            api.RegisterBlockEntityClass("BEDuckWeedRoot", typeof(BEDuckWeedRoot));
-
-            api.RegisterItemClass("ItemClipping", typeof(ItemClipping));
-            api.RegisterItemClass("ItemBerrySeed", typeof(ItemBerrySeed));
-            api.RegisterItemClass("ItemHerbSeed", typeof(ItemHerbSeed));
-            api.RegisterItemClass("HerbariumPoultice", typeof(HerbariumPoultice));
-
-            api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));
+            //Tree
             api.RegisterItemClass("ItemWildShield", typeof(ItemWildShield));
-            
+            api.RegisterBlockClass("BlockPricklyLeaves", typeof(BlockPricklyLeaves));
+
+
             networkHandler.RegisterMessages(api);
             HerbariumConfig.createConfig(api);
         }
