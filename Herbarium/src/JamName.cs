@@ -48,9 +48,9 @@ public class JamRecipeName : ICookingRecipeNamingHelper
             else return Lang.Get("unknown");
         }
 
-    private OrderedDictionary<ItemStack, int> mergeStacks(IWorldAccessor worldForResolve, ItemStack[] stacks)
+    private Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> mergeStacks(IWorldAccessor worldForResolve, ItemStack[] stacks)
     {
-        OrderedDictionary<ItemStack, int> dict = new OrderedDictionary<ItemStack, int>();
+        Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int> dict = new Vintagestory.API.Datastructures.OrderedDictionary<ItemStack, int>();
 
             List<ItemStack> stackslist = new List<ItemStack>(stacks);
             while (stackslist.Count > 0)
@@ -80,5 +80,4 @@ public class JamRecipeName : ICookingRecipeNamingHelper
 
             return dict;
         }
-    }
 }
