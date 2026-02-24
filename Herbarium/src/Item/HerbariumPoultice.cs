@@ -5,7 +5,6 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
-using herbarium.config;
 
 namespace herbarium
 {

@@ -71,7 +71,7 @@ namespace herbarium
                 api.Logger.Error("herb block not in water");
                 if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial != EnumBlockMaterial.Air)
                 {
-                    if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial == EnumBlockMaterial.Liquid && waterPlant)
+                    if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial == EnumBlockMaterial.Water && waterPlant)
                     {
                         goto plantHerb;
                     }
@@ -124,7 +124,7 @@ namespace herbarium
             IPlayer byPlayer = null;
             if (byEntity is EntityPlayer) byPlayer = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
 
-            bool planted = ((BlockEntityFarmland)be).TryPlant(cropBlock);
+            bool planted = ((BlockEntityFarmland)be).TryPlant(cropBlock,itemslot,byEntity,blockSel);
             if (planted)
             {
                 byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), pos.X, pos.Y, pos.Z, byPlayer);
