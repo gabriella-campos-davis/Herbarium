@@ -1,0 +1,30 @@
+{
+    "blockhelp-berrybush-clip": "Przyciąć gałąź",
+
+    "game:berrybush-too-cold": "Za zimno żeby kwitnąć lub owocować",
+    "game:berrybush-too-hot": "Za gorąco żeby kwitnąć lub owocować",
+
+    "game:clipping-too-cold": "Za zimno żeby rosnąć",
+    "game:clipping-too-hot": "Za gorąco żeby rosnąć",
+
+    "game:berrybush-shed-xdays": "Świeże jagody przez około {0} dni",
+    "game:berrybush-shed-1day": "Świeże jagody przez mniej niż jeden dzień",
+
+    "game:berrybush-sprouting-xdays": "Wypuści nowy przerost za około {0} dni",
+    "game:berrybush-sprouting-1day": "Wypuści nowy przerost za mniej niż jeden dzień",
+
+    "game:berrybush-clipping-growth-xdays": "Odrośnie przycięte gałęzie za około {0} dni",
+    "game:berrybush-clipping-growth-1day": "Odrośnie przycięte gałęzie za mniej niż jeden dzień",
+
+    "game:fruitingvine-sprouting-nosupport": "Nie może urosnąć wyżej bez poprawnej podpórki",
+
+    "game:placefailure-berrybushclipping": "Zraz musi być zasadzony w ziemi albo zaszczepiony na poprawną podkładke",
+    "game:placefailure-berrybushclipping-vinemix": "Nie można zaszczepić zraz z krzewów na pnącza",
+    "game:placefailure-berrybushclipping-nottallbush": "Ten krzew nie jest poprawną podkładką",
+    "game:placefailure-berrybushclipping-tootall": "Ten krzew jest za wysoki na szczepienie",
+
+    "game:placefailure-fruitvineclipping": "Zraz musi być zasadzony w ziemi albo zaszczepiony na poprawną podkładke",
+    "game:placefailure-fruitvineclipping-bushmix": "Nie można zaszczepić zrazów z pnączy na krzewy",
+    "game:placefailure-fruitvineclipping-nosupport": "Nie można zaszczepić zrazów z pnącza bez poprawnej podpory",
+    "game:placefailure-fruitvineclipping-tootall": "Te pnącze jest za długie na szczepienie"
+}

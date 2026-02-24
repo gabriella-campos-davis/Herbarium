@@ -1,8 +1,6 @@
 using ProtoBuf;
-using  System;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 
 namespace herbarium.config
@@ -12,24 +10,20 @@ namespace herbarium.config
         internal void RegisterMessages(ICoreAPI api)
         {
             api.Network
-                .RegisterChannel("herbariumchannel")
-                .RegisterMessageType(typeof(HerbariumConfigFromServerMessage))
-                .RegisterMessageType(typeof(OnPlayerLoginMessage));
-
-            ;
+               .RegisterChannel("herbariumchannel")
+               .RegisterMessageType(typeof(HerbariumConfigFromServerMessage))
+               .RegisterMessageType(typeof(OnPlayerLoginMessage));
         }
 
         #region Client
-        IClientNetworkChannel clientChannel;
-        ICoreClientAPI clientApi;
+        IClientNetworkChannel clientChannel = null!;
+        ICoreClientAPI clientApi = null!;
         public void InitializeClientSideNetworkHandler(ICoreClientAPI capi)
         {
             clientApi = capi;
 
             clientChannel = capi.Network.GetChannel("herbariumchannel")
-                .SetMessageHandler<HerbariumConfigFromServerMessage>(RecieveHerbariumConfigAction);
-            ;
-
+                                        .SetMessageHandler<HerbariumConfigFromServerMessage>(RecieveHerbariumConfigAction);
         }
 
         //SetToolConfigValues received from Server
@@ -37,21 +31,28 @@ namespace herbarium.config
         {
             HerbariumConfig.Current.plantsCanDamage = herbariumConfig.plantsCanDamage;
             HerbariumConfig.Current.plantsCanPoison = herbariumConfig.plantsCanPoison;
+            HerbariumConfig.Current.plantsDamage = herbariumConfig.plantsDamage;
+            HerbariumConfig.Current.plantsDamageTick = herbariumConfig.plantsDamageTick;
             HerbariumConfig.Current.plantsWillDamage = herbariumConfig.plantsWillDamage;
+
             HerbariumConfig.Current.poulticeHealOverTime = herbariumConfig.poulticeHealOverTime;
+
             HerbariumConfig.Current.berryBushCanDamage = herbariumConfig.berryBushCanDamage;
             HerbariumConfig.Current.berryBushDamage = herbariumConfig.berryBushDamage;
             HerbariumConfig.Current.berryBushDamageTick = herbariumConfig.berryBushDamageTick;
             HerbariumConfig.Current.berryBushWillDamage = herbariumConfig.berryBushWillDamage;
+            HerbariumConfig.Current.berryGrowthRateMul = herbariumConfig.berryGrowthRateMul;
+            HerbariumConfig.Current.berriesGrowByMonth = herbariumConfig.berriesGrowByMonth;
             HerbariumConfig.Current.useKnifeForClipping = herbariumConfig.useKnifeForClipping;
             HerbariumConfig.Current.useShearsForClipping = herbariumConfig.useShearsForClipping;
+            HerbariumConfig.Current.simplifiedBerryTooltips = herbariumConfig.simplifiedBerryTooltips;
         }
 
         #endregion
 
         #region server
-        IServerNetworkChannel serverChannel;
-        ICoreServerAPI serverApi;
+        IServerNetworkChannel serverChannel = null!;
+        ICoreServerAPI serverApi = null!;
         public void InitializeServerSideNetworkHandler(ICoreServerAPI api)
         {
             serverApi = api;
@@ -60,7 +61,7 @@ namespace herbarium.config
             api.Event.PlayerJoin += OnPlayerJoin;
 
             serverChannel = api.Network.GetChannel("herbariumchannel")
-                .SetMessageHandler<OnPlayerLoginMessage>(OnPlayerJoin);
+                                       .SetMessageHandler<OnPlayerLoginMessage>(OnPlayerJoin);
         }
 
         private void OnPlayerJoin(IServerPlayer player)
@@ -82,25 +83,29 @@ namespace herbarium.config
         [ProtoContract]
         class HerbariumConfigFromServerMessage
         {
-            public Nullable<bool> plantsCanDamage = HerbariumConfig.Current.plantsCanDamage;
-            public Nullable<bool> plantsCanPoison = HerbariumConfig.Current.plantsCanPoison;
+            public bool? plantsCanDamage = HerbariumConfig.Current.plantsCanDamage;
+            public bool? plantsCanPoison = HerbariumConfig.Current.plantsCanPoison;
+            public float? plantsDamage = HerbariumConfig.Current.plantsDamage;
+            public float? plantsDamageTick = HerbariumConfig.Current.plantsDamageTick;
             public string[] plantsWillDamage = HerbariumConfig.Current.plantsWillDamage;
 
-            public Nullable<bool> poulticeHealOverTime = HerbariumConfig.Current.poulticeHealOverTime;
-            public Nullable<bool> berryBushCanDamage = HerbariumConfig.Current.berryBushCanDamage;
-            public Nullable<float> berryBushDamage = HerbariumConfig.Current.berryBushDamage;
-            public Nullable<float> berryBushDamageTick = HerbariumConfig.Current.berryBushDamageTick;
+            public bool? poulticeHealOverTime = HerbariumConfig.Current.poulticeHealOverTime;
+            public bool? berryBushCanDamage = HerbariumConfig.Current.berryBushCanDamage;
+            public float? berryBushDamage = HerbariumConfig.Current.berryBushDamage;
+            public float? berryBushDamageTick = HerbariumConfig.Current.berryBushDamageTick;
             public string[] berryBushWillDamage = HerbariumConfig.Current.berryBushWillDamage;
-            public Nullable<bool> useKnifeForClipping = HerbariumConfig.Current.useKnifeForClipping;
-            public Nullable<bool> useShearsForClipping = HerbariumConfig.Current.useShearsForClipping;
-           
+            public float? berryGrowthRateMul = HerbariumConfig.Current.berryGrowthRateMul;
+            public bool? berriesGrowByMonth = HerbariumConfig.Current.berriesGrowByMonth;
+            public bool? useKnifeForClipping = HerbariumConfig.Current.useKnifeForClipping;
+            public bool? useShearsForClipping = HerbariumConfig.Current.useShearsForClipping;
+            public bool? simplifiedBerryTooltips = HerbariumConfig.Current.simplifiedBerryTooltips;
         }
 
         [ProtoContract]
         class OnPlayerLoginMessage
         {
             [ProtoMember(1)]
-            IPlayer[] fromPlayer;
+            IPlayer[] fromPlayer = null!;
         }
     }
 }

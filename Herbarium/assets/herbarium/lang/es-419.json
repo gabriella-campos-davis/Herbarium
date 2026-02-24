@@ -1,3 +1,30 @@
 {
-    "blockhelp-berrybush-clip": "Cortar rama"
+    "blockhelp-berrybush-clip": "Cortar rama",
+
+    "game:berrybush-too-cold": "Demasiado frío para florecer o dar frutos",
+    "game:berrybush-too-hot": "Demasiado calor para florecer o dar frutos",
+
+    "game:clipping-too-cold": "Demasiado frío para crecer",
+    "game:clipping-too-hot": "Demasiado calor para crecer",
+
+    "game:berrybush-shed-xdays": "Bayas frescas por alrededor de {0} días",
+    "game:berrybush-shed-1day": "Bayas frescas por menos de un día",
+
+    "game:berrybush-sprouting-xdays": "Brotará las ramas jóvenes en unos {0} días",
+    "game:berrybush-sprouting-1day": "Brotará las ramas jóvenes en menos de un día",
+
+    "game:berrybush-clipping-growth-xdays": "Rebrotará las ramas cortadas en unos {0} días",
+    "game:berrybush-clipping-growth-1day": "Rebrotará las en menos de un día",
+
+    "game:fruitingvine-sprouting-nosupport": "No puede crecer más alto sin soportes adecuados",
+
+    "game:placefailure-berrybushclipping": "Un esqueje debe plantarse en tierra o injertarse en un patrón adecuado",
+    "game:placefailure-berrybushclipping-vinemix": "No se pueden injertar esquejes de arbustos en vides",
+    "game:placefailure-berrybushclipping-nottallbush": "Este arbusto no es un patrón adecuado",
+    "game:placefailure-berrybushclipping-tootall": "Este arbusto es demasiado alto para el injerto",
+
+    "game:placefailure-fruitvineclipping": "Un esqueje debe plantarse en tierra o injertarse en un patrón adecuado",
+    "game:placefailure-fruitvineclipping-bushmix": "No se pueden injertar esquejes de vides en arbustos",
+    "game:placefailure-fruitvineclipping-nosupport": "No se pueden injertar esquejes de vid sin un soporte adecuado",
+    "game:placefailure-fruitvineclipping-tootall": "Esta vid es demasiado larga para el injerto"
 }

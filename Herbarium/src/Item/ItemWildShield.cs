@@ -40,14 +40,10 @@ namespace herbarium
         public override string GetHeldItemName(ItemStack itemStack)
         {
             bool ornate = itemStack.Attributes.GetString("deco") == "ornate";
-            string metal = itemStack.Attributes.GetString("metal");
             string wood = itemStack.Attributes.GetString("wood");
-            string color = itemStack.Attributes.GetString("color");
 
             switch (Construction)
             {
-                case "crude":
-                    return Lang.Get("Crude shield");
                 case "woodmetal":
                     if(wood == "chlorociboria")
                     {
@@ -55,23 +51,9 @@ namespace herbarium
                     }
                     if(wood == "petrified")
                     {
-                        return ornate ? Lang.Get("Petrified ornate  shield"): Lang.Get("Petrified wooden shield");
+                        return ornate ? Lang.Get("Petrified ornate shield"): Lang.Get("Petrified wooden shield");
                     }
-                    if (wood == "generic")
-                    {
-                        return ornate ? Lang.Get("Ornate wooden shield") : Lang.Get("Wooden shield");
-                    }
-                    if (wood == "aged")
-                    {
-                        return ornate ? Lang.Get("Aged ornate shield") : Lang.Get("Aged wooden shield");
-                    }
-                    return ornate ? Lang.Get("Ornate {0} shield", Lang.Get("material-" + wood)) : Lang.Get("{0} shield", Lang.Get("material-" + wood));
-                case "woodmetalleather":
-                    return ornate ? Lang.Get("Ornate leather reinforced wooden shield") : Lang.Get("Leather reinforced wooden shield");
-                case "metal":
-                    return ornate ? Lang.Get("shield-ornatemetal", Lang.Get("color-" + color), Lang.Get("material-" + metal)) : Lang.Get("shield-withmaterial", Lang.Get("material-" + metal));
-                case "blackguard":
-                    return Lang.Get("Blackguard shield");
+                    return base.GetHeldItemName(itemStack);
             }
 
             return base.GetHeldItemName(itemStack);

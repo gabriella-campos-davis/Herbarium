@@ -1,39 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Util;
-using Vintagestory.API;
-using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
 
 namespace herbarium
 {
     public class ItemHerbSeed : Item
     {        
-        bool waterPlant = false;
-        WorldInteraction[] interactions;
+        WorldInteraction[] interactions = null!;
         public override void OnLoaded(ICoreAPI api)
         {
-            if (api.Side != EnumAppSide.Client)
-                return;
-            ICoreClientAPI capi = api as ICoreClientAPI;
+            if (api.Side != EnumAppSide.Client) return;
 
             interactions = ObjectCacheUtil.GetOrCreate(api, "herbseedInteractions", () =>
             {
-                List<ItemStack> stacks = new List<ItemStack>();
-
-                foreach (Block block in api.World.Blocks)
-                {
-                    if (block.Code == null || block.EntityClass == null)
-                        continue;
-                    if (block.Fertility > 0)
-                    {
-                        stacks.Add(new ItemStack(block));
-                    }
-                }
+                ItemStack[] stacks = [.. api.World.Blocks.Where(block => block.Code != null && block.EntityClass != null && block.Fertility > 0)
+                                             .Select(block => new ItemStack(block))];
 
                 return new WorldInteraction[]
                 {
@@ -42,31 +29,36 @@ namespace herbarium
                         ActionLangCode = "heldhelp-plant",
                         MouseButton = EnumMouseButton.Right,
                         HotKeyCode = "sneak",
-                        Itemstacks = stacks.ToArray()
+                        Itemstacks = stacks
                     }
                 };
             });
         }
-        private void placeHerb(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling){
-            api.Logger.Error("herb block start");
-            if (!byEntity.Controls.Sneak)
+
+        public override void OnHeldInteractStart(ItemSlot itemslot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling)
+        {
+            if (blockSel == null) return;
+
+            IPlayer? byPlayer = byEntity.World.PlayerByUid((byEntity as EntityPlayer)?.PlayerUID);
+
+            if (api.World.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityFarmland)
             {
-                //base.OnHeldInteractStart(itemslot, byEntity, blockSel, entitySel, firstEvent, ref handHandling);
-                return;
-            }
+                if (!Attributes["isCrop"].AsBool()) return;
 
-            string herbtype = this.Variant["herbseedlings"];
-            Block herbBlock = api.World.GetBlock(AssetLocation.Create("seedling-" + herbtype + "-planted", this.Code.Domain)); 
+                Block cropBlock = byEntity.World.GetBlock(CodeWithPath("crop-" + itemslot.Itemstack.Collectible.LastCodePart() + "-1"));
+                if (cropBlock == null) return;
 
-            api.Logger.Error("herb block made");
-
-            if (herbBlock is not null)
-            {
-                api.Logger.Error("herb block not null");
-                if(Attributes["waterplant"].AsBool())
+                if (((BlockEntityFarmland)api.World.BlockAccessor.GetBlockEntity(blockSel.Position)).TryPlant(cropBlock, itemslot, byEntity, blockSel))
                 {
-                    waterPlant = true;
-                }
+                    byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
+
+                    ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+
+                    if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
+                    {
+                        itemslot.TakeOut(1);
+                        itemslot.MarkDirty();
+                    }
 
                 api.Logger.Error("herb block not in water");
                 if(api.World.BlockAccessor.GetBlock(blockSel.Position.UpCopy()).BlockMaterial != EnumBlockMaterial.Air)
@@ -86,10 +78,11 @@ namespace herbarium
 
                     api.World.BlockAccessor.SetBlock(herbBlock.Id, blockSel.Position.UpCopy());
 
-                    byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), blockSel.Position.X + 0.5f, blockSel.Position.Y, blockSel.Position.Z + 0.5f, byPlayer);
+                blockSel = blockSel.Clone();
+                blockSel.Position.Up();
 
-                    itemslot.TakeOut(1);
-                    itemslot.MarkDirty();
+                EnumBlockMaterial mat = api.World.BlockAccessor.GetBlock(blockSel.Position).BlockMaterial;
+                if (!byEntity.Controls.Sneak || (mat != EnumBlockMaterial.Air && Attributes["waterplant"].AsBool() && mat != EnumBlockMaterial.Liquid)) return;
 
                 }
             }
@@ -129,19 +122,18 @@ namespace herbarium
             {
                 byEntity.World.PlaySoundAt(new AssetLocation("game:sounds/block/plant"), pos.X, pos.Y, pos.Z, byPlayer);
 
-                ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
+                    ((byEntity as EntityPlayer)?.Player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 
-                if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
-                {
-                    itemslot.TakeOut(1);
-                    itemslot.MarkDirty();
+                    if (byPlayer?.WorldData?.CurrentGameMode != EnumGameMode.Creative)
+                    {
+                        itemslot.TakeOut(1);
+                        itemslot.MarkDirty();
+                    }
                 }
+
+                handHandling = EnumHandHandling.PreventDefault;
             }
-
-            if (planted) handHandling = EnumHandHandling.PreventDefault;
-            return;
         }
-
         
 
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
@@ -153,8 +145,7 @@ namespace herbarium
                 dsc.AppendLine(Lang.Get("plantable-on-normal-soil"));
                 if (Attributes["waterplant"].AsBool()) dsc.AppendLine(Lang.Get("plantable-in-water-or-land"));
                 return;
-            }  
-
+            }
             else if(Attributes["isCrop"].AsBool())
             {
                 Block cropBlock = world.GetBlock(CodeWithPath("crop-" + inSlot.Itemstack.Collectible.LastCodePart() + "-1"));
@@ -175,7 +166,7 @@ namespace herbarium
 
                 totalDays /= api.World.Config.GetDecimal("cropGrowthRateMul", 1);
 
-                dsc.AppendLine(Lang.Get("soil-growth-time") + Math.Round(totalDays, 1) + " days");
+                dsc.AppendLine(Lang.Get("soil-growth-time") + " " + Lang.Get("count-days", Math.Round(totalDays, 1)));
                 dsc.AppendLine(Lang.Get("crop-coldresistance", Math.Round(cropBlock.CropProps.ColdDamageBelow, 1)));
                 dsc.AppendLine(Lang.Get("crop-heatresistance", Math.Round(cropBlock.CropProps.HeatDamageAbove, 1)));
                 dsc.AppendLine(Lang.Get("plantable-on-farmland-or-soil"));  

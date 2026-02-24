@@ -10,7 +10,16 @@ namespace herbarium
 {
     public class HerbariumPoultice : ItemPoultice
     {
-         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
+        bool isHealingOverTimeEnabled = HerbariumConfig.Current.poulticeHealOverTime.Value;
+
+        public override void OnLoaded(ICoreAPI api)
+        {
+            base.OnLoaded(api);
+
+            isHealingOverTimeEnabled = api.World.Config.GetBool("poulticeHealOverTime", isHealingOverTimeEnabled);
+        }
+
+        public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
             byEntity.World.RegisterCallback((dt) =>
             {
@@ -48,8 +57,6 @@ namespace herbarium
 
                 double time = 8 - secondaryHealth;
 
-                bool isHealingOverTimeEnabled = HerbariumConfig.Current.poulticeHealOverTime.Value;
-
                 /*
                 following line for vanilla poultice health attributes. 
                 (i could make a patch to give them proper health properties,
@@ -75,7 +82,7 @@ namespace herbarium
                     // only consume item and apply buff if there isn't a buff already active
                     if (!isPoulticeActive) {
                         var buff = new PoulticeBuff();
-                        buff.init(health, time);
+                        buff.SetHealthAndTime(health, time);
                         buff.Apply(entitySel?.Entity != null ? entitySel.Entity : byEntity);
 
                         if(isRashDebuff && curesRash){

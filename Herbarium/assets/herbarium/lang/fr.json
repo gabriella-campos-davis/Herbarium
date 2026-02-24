@@ -1,3 +1,30 @@
 {
-    "blockhelp-berrybush-clip": "Couper la branche"
+    "blockhelp-berrybush-clip": "Couper la branche",
+
+    "game:berrybush-too-cold": "Trop froid pour fleurir ou fructifier",
+    "game:berrybush-too-hot": "Trop chaud pour fleurir ou fructifier",
+
+    "game:clipping-too-cold": "Trop froid pour pousser",
+    "game:clipping-too-hot": "Trop chaud pour pousser",
+
+    "game:berrybush-shed-xdays": "Baies fraiches pendant {0} jours",
+    "game:berrybush-shed-1day": "Baies fraiches pendant moins d'une journée",
+
+    "game:berrybush-sprouting-xdays": "Va produire une nouvelle pousse dans {0} jours",
+    "game:berrybush-sprouting-1day": "Va produire une nouvelle pousse dans moins d'une journée",
+
+    "game:berrybush-clipping-growth-xdays": "Les branches coupées vont repousser dans {0} jours",
+    "game:berrybush-clipping-growth-1day": "Les branches coupées vont repousser dans moins d'une journée",
+
+    "game:fruitingvine-sprouting-nosupport": "Ne peut pas pousser plus haut sans support adéquat",
+
+    "game:placefailure-berrybushclipping": "Une bouture doit être plantée dans la terre ou greffée sur un porte-greffe approprié",
+    "game:placefailure-berrybushclipping-vinemix": "Impossible de greffer des boutures d'arbuste sur des vignes",
+    "game:placefailure-berrybushclipping-nottallbush": "Cet arbuste n'est pas un porte-greffe adapté",
+    "game:placefailure-berrybushclipping-tootall": "Cet arbuste est trop grand pour être greffé",
+
+    "game:placefailure-fruitvineclipping": "Une bouture doit être plantée dans la terre ou greffée sur un porte-greffe approprié",
+    "game:placefailure-fruitvineclipping-bushmix": "Impossible de greffer des boutures de vigne sur des arbustes",
+    "game:placefailure-fruitvineclipping-nosupport": "Impossible de greffer des boutures de vigne sans support adéquat",
+    "game:placefailure-fruitvineclipping-tootall": "Cette vigne est trop longue pour être greffée"
 }
