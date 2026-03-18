@@ -93,22 +93,10 @@ namespace herbarium
             api.RegisterItemClass("HerbariumPoultice", typeof(HerbariumPoultice));
 
             api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));
-            api.RegisterItemClass("ItemWildShield", typeof(ItemWildShield));
+            api.RegisterItemClass("ItemWildShield", typeof(ItemShieldFromAttributes));
             
             networkHandler.RegisterMessages(api);
             HerbariumConfig.createConfig(api);
-        }
-
-        public override void AssetsFinalize(ICoreAPI api)
-        {
-            base.AssetsFinalize(api);
-            api.GetCookingRecipes().ForEach(recipe =>
-            {
-                if (CookingRecipe.NamingRegistry.ContainsKey("jam"))
-                {
-                    CookingRecipe.NamingRegistry["jam"] = new JamRecipeName();
-                }
-            });
         }
     }
 }

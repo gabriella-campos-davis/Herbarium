@@ -71,7 +71,7 @@ namespace herbarium
                 blockSel.Position.Up();
 
                 EnumBlockMaterial mat = api.World.BlockAccessor.GetBlock(blockSel.Position).BlockMaterial;
-                if (!byEntity.Controls.Sneak || (mat != EnumBlockMaterial.Air && Attributes["waterplant"].AsBool() && mat != EnumBlockMaterial.Liquid)) return;
+                if (!byEntity.Controls.Sneak || (mat != EnumBlockMaterial.Air && Attributes["waterplant"].AsBool() && mat != EnumBlockMaterial.Water)) return;
 
                 string failureCode = "";
                 if (!herbBlock?.TryPlaceBlock(api.World, byPlayer, itemslot.Itemstack, blockSel, ref failureCode) ?? true)
