@@ -138,11 +138,16 @@ namespace herbarium
                     world.PlaySoundAt(harvestingSound, blockSel.Position.X, blockSel.Position.Y, blockSel.Position.Z, byPlayer);
                 }
 
-                clipping = new ItemStack(api.World.GetItem(AssetLocation.Create(this.Attributes["pruneItem"].ToString())), 1);
-                if (clipping is null){
-                    api.Logger.Error("Attempted to create clipping for " + this.Variant["type"] + ", came back null.");
+                if (!this.Attributes["pruneItem"].Exists){
+                    api.Logger.Warning("Herbarium: block {0} is missing 'pruneItem' attribute; cannot create clipping.", Code);
                     return false;
                 }
+                Item pruneItemType = api.World.GetItem(AssetLocation.Create(this.Attributes["pruneItem"].ToString()));
+                if (pruneItemType is null){
+                    api.Logger.Error("Attempted to create clipping for " + this.Variant["type"] + ", pruneItem '" + this.Attributes["pruneItem"].ToString() + "' did not resolve to a known item.");
+                    return false;
+                }
+                clipping = new ItemStack(pruneItemType, 1);
 
                 if (world.Rand.NextDouble() < 0.25)
                 {

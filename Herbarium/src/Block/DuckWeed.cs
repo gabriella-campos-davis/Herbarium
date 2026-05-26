@@ -185,6 +185,11 @@ namespace herbarium
                     belowBlock = world.BlockAccessor.GetBlock(pos.DownCopy(currentDepth));
                     if (belowBlock.LiquidCode != "water" && belowBlock.BlockMaterial != EnumBlockMaterial.Plant)
                     {
+                        if (!Attributes["rootBlock"].Exists)
+                        {
+                            api.Logger.Warning("Herbarium: block {0} is missing 'rootBlock' attribute; skipping root placement.", Code);
+                            return;
+                        }
                         Block placingBlock = world.BlockAccessor.GetBlock(new AssetLocation(Attributes["rootBlock"].ToString()));
                         if (placingBlock == null) return;
 
@@ -217,7 +222,17 @@ namespace herbarium
                 if(world.BlockAccessor.GetBlock(newDuckweedPos.DownCopy(), BlockLayersAccess.Fluid).LiquidCode != "water") return; //are we placing in water?
                 if(world.BlockAccessor.GetBlock(newDuckweedPos.DownCopy(growthDepth), BlockLayersAccess.Fluid).LiquidCode == "water") return; //is the water too deep?
 
+                if (!Attributes["duckweedBlock"].Exists)
+                {
+                    api.Logger.Warning("Herbarium: block {0} is missing 'duckweedBlock' attribute; skipping growth.", Code);
+                    return;
+                }
                 Block placingBlock = world.BlockAccessor.GetBlock(new AssetLocation(Attributes["duckweedBlock"].ToString()));
+                if (placingBlock == null)
+                {
+                    api.Logger.Warning("Herbarium: block {0} duckweedBlock '{1}' does not resolve to a known block; skipping growth.", Code, Attributes["duckweedBlock"].ToString());
+                    return;
+                }
                 world.BlockAccessor.SetBlock(placingBlock.BlockId, newDuckweedPos);
             }
         }
