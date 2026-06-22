@@ -106,8 +106,19 @@ namespace herbarium
         {
             Block aboveBlock = blockAccessor.GetBlock(pos.UpCopy());
 
+            if(!Attributes["middleBlock"].Exists || !Attributes["topBlock"].Exists)
+            {
+                api.Logger.Warning("Herbarium: block {0} is missing 'middleBlock'/'topBlock' attribute(s); skipping kelp placement.", Code);
+                return;
+            }
+
             Block middleBlock = blockAccessor.GetBlock(new AssetLocation(Attributes["middleBlock"].ToString()));
             Block topBlock = blockAccessor.GetBlock(new AssetLocation(Attributes["topBlock"].ToString()));
+            if(middleBlock == null || topBlock == null)
+            {
+                api.Logger.Warning("Herbarium: block {0} middleBlock '{1}' or topBlock '{2}' does not resolve to a known block; skipping kelp placement.", Code, Attributes["middleBlock"].ToString(), Attributes["topBlock"].ToString());
+                return;
+            }
 
             int kelpHeight = worldGenRand.NextInt(kelpMaxHeight) + kelpMinHeight;
 

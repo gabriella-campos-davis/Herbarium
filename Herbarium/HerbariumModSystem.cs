@@ -93,7 +93,7 @@ namespace herbarium
             api.RegisterItemClass("HerbariumPoultice", typeof(HerbariumPoultice));
 
             api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));
-            api.RegisterItemClass("ItemWildShield", typeof(ItemShieldFromAttributes));
+            api.RegisterItemClass("ItemWildShield", typeof(ItemWildShield));
             
             networkHandler.RegisterMessages(api);
             HerbariumConfig.createConfig(api);

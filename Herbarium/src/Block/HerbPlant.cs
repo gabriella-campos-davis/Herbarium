@@ -89,7 +89,7 @@ namespace herbarium
                 return base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
             }
 
-            if(Attributes["hasRoot"].ToString() == "true" && !IsGrown()){
+            if(Attributes["hasRoot"].AsBool(false) && !IsGrown()){
                 return base.GetDrops(world, pos, byPlayer, dropQuantityMultiplier);
             }
             else
