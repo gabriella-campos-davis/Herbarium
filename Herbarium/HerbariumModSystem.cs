@@ -6,10 +6,10 @@ using BuffStuff;
 using Vintagestory.GameContent;
 
 
-[assembly: ModInfo( "Herbarium Plant Library",
-	Description = "Implements various useful classes related to plants for other mods to use",
-	Website     = "",
-	Authors     = new []{ "gabb", "pizza2004", "CATASTEROID" } )]
+[assembly: ModInfo("Herbarium Plant Library",
+    Description = "Implements various useful classes related to plants for other mods to use",
+    Website = "",
+    Authors = new[] { "gabb", "pizza2004", "CATASTEROID" })]
 
 namespace herbarium
 {
@@ -71,7 +71,7 @@ namespace herbarium
             api.RegisterBlockClass("GiantKelp", typeof(GiantKelp));
 
             api.RegisterBlockBehaviorClass("BlockBehaviorHarvestMultiple", typeof(BlockBehaviorHarvestable));
-           
+
             api.RegisterBlockEntityClass("BEHerbariumBerryBush", typeof(BEHerbariumBerryBush));
             api.RegisterBlockEntityClass("BEShrubBerryBush", typeof(BEHerbariumBerryBush));
             api.RegisterBlockEntityClass("BETallBerryBush", typeof(BETallBerryBush));
@@ -94,9 +94,16 @@ namespace herbarium
 
             api.RegisterItemClass("ItemWildTreeSeed", typeof(ItemWildTreeSeed));
             api.RegisterItemClass("ItemWildShield", typeof(ItemWildShield));
-            
+
             networkHandler.RegisterMessages(api);
             HerbariumConfig.createConfig(api);
+        }
+
+        public override void AssetsFinalize(ICoreAPI api)
+        {
+            base.AssetsFinalize(api);
+            CookingRecipe.NamingRegistry["gruel"] = new HerbariumRecipeNames();
+            CookingRecipe.NamingRegistry["compote"] = new HerbariumRecipeNames();
         }
     }
 }
